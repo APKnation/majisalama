@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout";
 import {
   getAllWaterSources,
+  getAllVillages,
   createWaterSource,
   updateWaterSource,
   deleteWaterSource,
@@ -11,6 +12,7 @@ import {
 
 export default function WaterSourcesAdmin() {
   const [sources, setSources] = useState([]);
+  const [villages, setVillages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingSource, setEditingSource] = useState(null);
@@ -27,6 +29,7 @@ export default function WaterSourcesAdmin() {
 
   useEffect(() => {
     fetchSources();
+    fetchVillages();
   }, []);
 
   const fetchSources = async () => {
@@ -37,6 +40,15 @@ export default function WaterSourcesAdmin() {
       console.error("Error:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchVillages = async () => {
+    try {
+      const response = await getAllVillages();
+      setVillages(response.data.results || response.data);
+    } catch (error) {
+      console.error("Error loading villages:", error);
     }
   };
 
@@ -235,6 +247,25 @@ export default function WaterSourcesAdmin() {
                   <option value="dam">Bwawa</option>
                   <option value="borehole">Bomba la Kuchimba</option>
                   <option value="rainwater">Maji ya Mvua</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Kijiji
+                </label>
+                <select
+                  value={formData.village_id}
+                  onChange={(e) =>
+                    setFormData({ ...formData, village_id: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="">Chagua kijiji</option>
+                  {villages.map((village) => (
+                    <option key={village.id} value={village.id}>
+                      {village.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">

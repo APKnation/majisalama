@@ -1,15 +1,23 @@
 # backend/watertrack_app/views.py
 
 from rest_framework import viewsets, status, filters
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.permissions import BasePermission, IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from .models import *
 from .serializers import *
+
+class IsAppAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and (request.user.is_superuser or request.user.role == 'admin' or request.user.is_staff)
+        )
 
 # ✅ ONGEZA HII: Village ViewSet
 class VillageViewSet(viewsets.ModelViewSet):
@@ -74,6 +82,7 @@ class WaterSourceViewSet(viewsets.ModelViewSet):
 class DamageReportViewSet(viewsets.ModelViewSet):
     queryset = DamageReport.objects.all()
     serializer_class = DamageReportSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'priority', 'water_source__village']
     
@@ -99,6 +108,11 @@ class DamageReportViewSet(viewsets.ModelViewSet):
         report.resolution_notes = request.data.get('notes', '')
         report.save()
         return Response({'message': 'Ripoti imetatuliwa'})
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all().order_by('username')
+    serializer_class = UserSerializer
+    permission_classes = [IsAppAdmin]
 
 class QualityReportViewSet(viewsets.ModelViewSet):
     queryset = QualityReport.objects.all()

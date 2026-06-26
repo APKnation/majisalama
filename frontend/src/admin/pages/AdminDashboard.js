@@ -208,7 +208,7 @@ export default function AdminDashboard() {
           </h3>
           <div className="space-y-3">
             <Link
-              to="/admin/water-sources/new"
+              to="/admin/water-sources"
               className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
             >
               <span className="text-2xl">➕</span>
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
               </div>
             </Link>
             <Link
-              to="/admin/quality/new"
+              to="/admin/quality"
               className="flex items-center gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
             >
               <span className="text-2xl">🔬</span>

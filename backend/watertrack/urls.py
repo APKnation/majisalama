@@ -13,6 +13,7 @@ router.register(r'water-sources', WaterSourceViewSet)
 router.register(r'damage-reports', DamageReportViewSet)
 router.register(r'quality-reports', QualityReportViewSet)
 router.register(r'alerts', AlertViewSet)
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

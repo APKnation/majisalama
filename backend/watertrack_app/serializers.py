@@ -10,11 +10,34 @@ class VillageSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     village = VillageSerializer(read_only=True)
+    village_id = serializers.PrimaryKeyRelatedField(
+        queryset=Village.objects.all(), source='village', write_only=True, required=False, allow_null=True
+    )
+    password = serializers.CharField(write_only=True, required=False)
     is_superuser = serializers.BooleanField(read_only=True)
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'role', 'phone', 'village', 'is_superuser']
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'role', 'phone', 'village', 'village_id', 'password', 'is_superuser'
+        ]
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        user = super().create(validated_data)
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        user = super().update(instance, validated_data)
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
 
 class UserDetailsSerializer(serializers.ModelSerializer):
     village = VillageSerializer(read_only=True)
@@ -73,6 +96,9 @@ class QualityReportSerializer(serializers.ModelSerializer):
 
 class DamageReportSerializer(serializers.ModelSerializer):
     water_source = WaterSourceSerializer(read_only=True)
+    water_source_id = serializers.PrimaryKeyRelatedField(
+        queryset=WaterSource.objects.all(), source='water_source', write_only=True, required=False
+    )
     reported_by = UserSerializer(read_only=True)
     assigned_to = UserSerializer(read_only=True)
     priority_display = serializers.CharField(source='get_priority_display', read_only=True)
@@ -82,8 +108,22 @@ class DamageReportSerializer(serializers.ModelSerializer):
         model = DamageReport
         fields = '__all__'
 
+class QualityReportSerializer(serializers.ModelSerializer):
+    water_source = WaterSourceSerializer(read_only=True)
+    water_source_id = serializers.PrimaryKeyRelatedField(
+        queryset=WaterSource.objects.all(), source='water_source', write_only=True
+    )
+    tested_by = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = QualityReport
+        fields = '__all__'
+
 class AlertSerializer(serializers.ModelSerializer):
     water_source = WaterSourceSerializer(read_only=True)
+    water_source_id = serializers.PrimaryKeyRelatedField(
+        queryset=WaterSource.objects.all(), source='water_source', write_only=True, required=False, allow_null=True
+    )
     alert_type_display = serializers.CharField(source='get_alert_type_display', read_only=True)
     
     class Meta:

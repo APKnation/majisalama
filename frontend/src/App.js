@@ -24,6 +24,11 @@ import DistrictDashboard from "./pages/DistrictDashboard";
 // Admin imports
 import AdminDashboard from "./admin/pages/AdminDashboard";
 import WaterSourcesAdmin from "./admin/pages/WaterSourcesAdmin";
+import UsersAdmin from "./admin/pages/UsersAdmin";
+import VillagesAdmin from "./admin/pages/VillagesAdmin";
+import DamageReportsAdmin from "./admin/pages/DamageReportsAdmin";
+import QualityReportsAdmin from "./admin/pages/QualityReportsAdmin";
+import AlertsAdmin from "./admin/pages/AlertsAdmin";
 
 // ✅ Protected Admin Route Component
 const AdminRoute = ({ children }) => {
@@ -243,7 +248,46 @@ function App() {
               </AdminRoute>
             }
           />
-          {/* Add more admin routes here */}
+          <Route
+            path="/admin/reports"
+            element={
+              <AdminRoute>
+                <DamageReportsAdmin />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/quality"
+            element={
+              <AdminRoute>
+                <QualityReportsAdmin />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/villages"
+            element={
+              <AdminRoute>
+                <VillagesAdmin />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                <UsersAdmin />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/alerts"
+            element={
+              <AdminRoute>
+                <AlertsAdmin />
+              </AdminRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
