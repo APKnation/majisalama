@@ -1,27 +1,18 @@
-// src/admin/components/AdminLayout.jsx
-
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-export default function AdminLayout({ children }) {
+export default function DistrictOfficerLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const menuItems = [
-    { path: "/admin", icon: "📊", label: "Dashboard" },
-    { path: "/admin/water-sources", icon: "💧", label: "Vyanzo vya Maji" },
-    { path: "/admin/reports", icon: "📋", label: "Ripoti za Uharibifu" },
-    { path: "/admin/quality", icon: "🔬", label: "Ripoti za Ubora" },
-    { path: "/admin/villages", icon: "🏘️", label: "Vijiji" },
-    { path: "/admin/users", icon: "👥", label: "Watumiaji" },
-    { path: "/admin/alerts", icon: "🔔", label: "Arifa" },
+    { path: "/district-dashboard", icon: "📊", label: "Dashboard" },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + "/");
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
@@ -35,20 +26,19 @@ export default function AdminLayout({ children }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:relative lg:flex flex-col bg-gray-900 text-white transition-all duration-300 h-screen z-40 ${
+        className={`fixed lg:relative lg:flex flex-col bg-slate-900 text-white transition-all duration-300 h-screen z-40 ${
           sidebarOpen ? "w-64" : "w-0 -left-64 lg:left-0"
         } ${sidebarCollapsed ? "lg:w-20" : "lg:w-64"}`}
       >
-        {/* Logo */}
-        <div className="p-4 lg:p-6 border-b border-gray-800">
+        <div className="p-4 lg:p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
-              💧
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
+              🏛️
             </div>
             {(sidebarOpen || !sidebarCollapsed) && (
               <div className="min-w-0">
                 <h1 className="font-bold text-lg truncate">WaterTrack</h1>
-                <p className="text-xs text-gray-400 truncate">Admin Panel</p>
+                <p className="text-xs text-slate-300 truncate">Mfanyakazi wa Wilaya</p>
               </div>
             )}
           </div>
@@ -57,20 +47,19 @@ export default function AdminLayout({ children }) {
         {/* Close button for mobile */}
         <button
           onClick={() => setSidebarOpen(false)}
-          className="lg:hidden p-4 text-gray-400 hover:text-white border-b border-gray-800 text-right"
+          className="lg:hidden p-4 text-slate-300 hover:text-white border-b border-slate-800 text-right"
         >
           ✕
         </button>
 
-        {/* Toggle Button for desktop */}
+        {/* Collapse button for desktop */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="hidden lg:block p-4 text-gray-400 hover:text-white border-b border-gray-800"
+          className="hidden lg:block p-4 text-slate-300 hover:text-white border-b border-slate-800"
         >
           {sidebarCollapsed ? "▶" : "◀"}
         </button>
 
-        {/* Menu */}
         <nav className="flex-1 py-4 overflow-y-auto">
           {menuItems.map((item) => (
             <Link
@@ -80,7 +69,7 @@ export default function AdminLayout({ children }) {
               className={`flex items-center gap-3 px-4 py-3 mx-2 rounded-lg transition-colors text-sm md:text-base ${
                 isActive(item.path)
                   ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
               }`}
             >
               <span className="text-lg flex-shrink-0">{item.icon}</span>
@@ -91,16 +80,15 @@ export default function AdminLayout({ children }) {
           ))}
         </nav>
 
-        {/* User Info */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center flex-shrink-0">
               👤
             </div>
             {(sidebarOpen || !sidebarCollapsed) && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user?.username}</p>
-                <p className="text-xs text-gray-400 capitalize truncate">{user?.role}</p>
+                <p className="text-xs text-slate-400 capitalize truncate">{user?.role}</p>
               </div>
             )}
           </div>
@@ -117,7 +105,6 @@ export default function AdminLayout({ children }) {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-auto w-full">
-        {/* Top Bar */}
         <header className="bg-white shadow-sm px-4 lg:px-8 py-3 lg:py-4 flex items-center justify-between sticky top-0 z-20">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -129,20 +116,10 @@ export default function AdminLayout({ children }) {
             </svg>
           </button>
           <h2 className="text-lg lg:text-xl font-bold text-gray-800">
-            {menuItems.find((item) => item.path === location.pathname)?.label || "Admin"}
+            {menuItems.find((item) => item.path === location.pathname)?.label || "Wilaya"}
           </h2>
-          <div className="flex items-center gap-2 lg:gap-4">
-            <button className="relative p-2 text-gray-600 hover:text-gray-900">
-              🔔
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <button className="hidden sm:block p-2 text-gray-600 hover:text-gray-900">
-              ⚙️
-            </button>
-          </div>
+          <div className="w-6" />
         </header>
-
-        {/* Page Content */}
         <div className="p-4 sm:p-6 lg:p-8 overflow-auto">{children}</div>
       </main>
     </div>

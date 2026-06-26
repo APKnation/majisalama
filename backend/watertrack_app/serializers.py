@@ -129,3 +129,21 @@ class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
         fields = '__all__'
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    recipient = UserSerializer(read_only=True)
+    recipient_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source='recipient', write_only=True
+    )
+    related_report = DamageReportSerializer(read_only=True)
+    related_report_id = serializers.PrimaryKeyRelatedField(
+        queryset=DamageReport.objects.all(), source='related_report', write_only=True, required=False, allow_null=True
+    )
+
+    class Meta:
+        model = Message
+        fields = [
+            'id', 'sender', 'recipient', 'recipient_id', 'subject', 'body',
+            'related_report', 'related_report_id', 'is_read', 'created_at'
+        ]

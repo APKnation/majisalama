@@ -18,7 +18,22 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Alerts from "./pages/Alerts";
 import VillageDashboard from "./pages/VillageDashboard";
+import VillageLeaderLayout from "./layouts/VillageLeaderLayout";
+import DistrictOfficerLayout from "./layouts/DistrictOfficerLayout";
+import WaterOfficerLayout from "./layouts/WaterOfficerLayout";
+import VillageSources from "./pages/VillageSources";
+import VillageReports from "./pages/VillageReports";
+import CreateReport from "./pages/CreateReport";
+import AssignTasks from "./pages/AssignTasks";
+import Inspections from "./pages/Inspections";
+import Messages from "./pages/Messages";
+import VillageUsers from "./pages/VillageUsers";
+import Notifications from "./pages/Notifications";
+import ExportReports from "./pages/ExportReports";
+import VillageSettings from "./pages/VillageSettings";
 import WaterOfficerDashboard from "./pages/WaterOfficerDashboard";
+import WaterOfficerReports from "./pages/WaterOfficerReports";
+import WaterOfficerSources from "./pages/WaterOfficerSources";
 import DistrictDashboard from "./pages/DistrictDashboard";
 
 // Admin imports
@@ -181,10 +196,109 @@ function App() {
             path="/village-dashboard"
             element={
               <RoleRoute allowedRoles={["village_leader"]}>
-                <>
-                  <Navbar />
+                <VillageLeaderLayout>
                   <VillageDashboard />
-                </>
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-sources"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <VillageSources />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-reports"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <VillageReports />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-create"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <CreateReport />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-assign"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <AssignTasks />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-inspections"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <Inspections />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-messages"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <Messages />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-users"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <VillageUsers />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-notifications"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <Notifications />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-export"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <ExportReports />
+                </VillageLeaderLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/village-settings"
+            element={
+              <RoleRoute allowedRoles={["village_leader"]}>
+                <VillageLeaderLayout>
+                  <VillageSettings />
+                </VillageLeaderLayout>
               </RoleRoute>
             }
           />
@@ -192,10 +306,29 @@ function App() {
             path="/water-officer-dashboard"
             element={
               <RoleRoute allowedRoles={["water_officer"]}>
-                <>
-                  <Navbar />
+                <WaterOfficerLayout>
                   <WaterOfficerDashboard />
-                </>
+                </WaterOfficerLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/water-officer-reports"
+            element={
+              <RoleRoute allowedRoles={["water_officer"]}>
+                <WaterOfficerLayout>
+                  <WaterOfficerReports />
+                </WaterOfficerLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/water-officer-sources"
+            element={
+              <RoleRoute allowedRoles={["water_officer"]}>
+                <WaterOfficerLayout>
+                  <WaterOfficerSources />
+                </WaterOfficerLayout>
               </RoleRoute>
             }
           />
@@ -203,10 +336,9 @@ function App() {
             path="/district-dashboard"
             element={
               <RoleRoute allowedRoles={["district_officer"]}>
-                <>
-                  <Navbar />
+                <DistrictOfficerLayout>
                   <DistrictDashboard />
-                </>
+                </DistrictOfficerLayout>
               </RoleRoute>
             }
           />

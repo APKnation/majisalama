@@ -19,6 +19,18 @@ class IsAppAdmin(BasePermission):
             and (request.user.is_superuser or request.user.role == 'admin' or request.user.is_staff)
         )
 
+class IsVillageLeaderOrAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and (
+                request.user.is_superuser
+                or request.user.role == 'admin'
+                or request.user.role == 'village_leader'
+            )
+        )
+
 # ✅ ONGEZA HII: Village ViewSet
 class VillageViewSet(viewsets.ModelViewSet):
     queryset = Village.objects.all()
@@ -84,25 +96,51 @@ class DamageReportViewSet(viewsets.ModelViewSet):
     serializer_class = DamageReportSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['status', 'priority', 'water_source__village']
-    
+    filterset_fields = ['status', 'priority', 'water_source__village', 'assigned_to']
+
+    def get_permissions(self):
+        if self.action in ['assign', 'resolve']:
+            return [IsAuthenticated(), IsVillageLeaderOrAdmin()]
+        return [IsAuthenticated()]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser or user.role == 'admin':
+            return DamageReport.objects.all()
+        if user.role == 'village_leader':
+            return DamageReport.objects.filter(water_source__village=user.village)
+        if user.role == 'water_officer':
+            return DamageReport.objects.filter(assigned_to=user)
+        if user.role == 'citizen':
+            return DamageReport.objects.filter(reported_by=user)
+        return DamageReport.objects.none()
+
+    def perform_create(self, serializer):
+        serializer.save(reported_by=self.request.user)
+
     @action(detail=True, methods=['post'])
     def assign(self, request, pk=None):
         report = self.get_object()
+        if request.user.role == 'village_leader' and report.water_source.village != request.user.village:
+            return Response({'error': 'Hauna ruhusa ya kugawa ripoti hii'}, status=status.HTTP_403_FORBIDDEN)
+
         worker_id = request.data.get('worker_id')
-        
         try:
             worker = User.objects.get(id=worker_id, role='water_officer')
+            if request.user.role == 'village_leader' and worker.village != request.user.village:
+                return Response({'error': 'Mafanyakazi lazima awe wa kijiji chako'}, status=status.HTTP_400_BAD_REQUEST)
             report.assigned_to = worker
             report.status = 'assigned'
             report.save()
             return Response({'message': 'Kazi imepewa mafanikio'})
         except User.DoesNotExist:
             return Response({'error': 'Wafanyakazi hayupatikani'}, status=400)
-    
+
     @action(detail=True, methods=['post'])
     def resolve(self, request, pk=None):
         report = self.get_object()
+        if request.user.role == 'village_leader' and report.water_source.village != request.user.village:
+            return Response({'error': 'Hauna ruhusa ya kutatua ripoti hii'}, status=status.HTTP_403_FORBIDDEN)
         report.status = 'resolved'
         report.resolved_at = timezone.now()
         report.resolution_notes = request.data.get('notes', '')
@@ -112,7 +150,42 @@ class DamageReportViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('username')
     serializer_class = UserSerializer
-    permission_classes = [IsAppAdmin]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['role', 'village']
+    search_fields = ['username', 'email', 'first_name', 'last_name']
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [IsAppAdmin()]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return User.objects.none()
+        if user.is_superuser or user.role == 'admin':
+            return User.objects.all().order_by('username')
+        if user.role == 'village_leader':
+            return User.objects.filter(village=user.village, role__in=['water_officer', 'village_leader']).order_by('username')
+        return User.objects.filter(id=user.id)
+
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Message.objects.filter(recipient=user) | Message.objects.filter(sender=user)
+        folder = self.request.query_params.get('folder')
+        if folder == 'inbox':
+            queryset = queryset.filter(recipient=user)
+        elif folder == 'sent':
+            queryset = queryset.filter(sender=user)
+        return queryset.distinct().order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
 
 class QualityReportViewSet(viewsets.ModelViewSet):
     queryset = QualityReport.objects.all()
@@ -122,6 +195,16 @@ class QualityReportViewSet(viewsets.ModelViewSet):
 class AlertViewSet(viewsets.ModelViewSet):
     queryset = Alert.objects.all()
     serializer_class = AlertSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['alert_type', 'water_source']
+    search_fields = ['message']
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Alert.objects.none()
+        return Alert.objects.filter(recipients=user).distinct()
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
