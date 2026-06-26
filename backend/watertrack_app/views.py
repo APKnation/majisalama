@@ -1,9 +1,11 @@
 # backend/watertrack_app/views.py
 
 from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from .models import *
@@ -106,3 +108,35 @@ class QualityReportViewSet(viewsets.ModelViewSet):
 class AlertViewSet(viewsets.ModelViewSet):
     queryset = Alert.objects.all()
     serializer_class = AlertSerializer
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def custom_login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    if not username or not password:
+        return Response({'error': 'Username and password required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = authenticate(username=username, password=password)
+    
+    if user is None:
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    refresh = RefreshToken.for_user(user)
+    
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'role': user.role,
+            'phone': user.phone,
+            'village': VillageSerializer(user.village).data if user.village else None,
+            'is_superuser': user.is_superuser,
+        }
+    })

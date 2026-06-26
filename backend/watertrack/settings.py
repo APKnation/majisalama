@@ -131,9 +131,9 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = {'username'}
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
 
 REST_AUTH = {
     'USE_JWT': True,

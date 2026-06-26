@@ -10,7 +10,7 @@ class VillageSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     village = VillageSerializer(read_only=True)
-    is_superuser = serializers.BooleanField(read_only=True)  # ✅ ONGEZA HII
+    is_superuser = serializers.BooleanField(read_only=True)
     
     class Meta:
         model = User
@@ -23,6 +23,16 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'role', 'phone', 'village', 'is_superuser']
+
+class LoginSerializer(serializers.ModelSerializer):
+    village = VillageSerializer(read_only=True)
+    is_superuser = serializers.BooleanField(read_only=True)
+    access = serializers.CharField(read_only=True)
+    refresh = serializers.CharField(read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'role', 'phone', 'village', 'is_superuser', 'access', 'refresh']
 
 class WaterSourceSerializer(serializers.ModelSerializer):
     village = VillageSerializer(read_only=True)
