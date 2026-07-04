@@ -2,6 +2,22 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout";
 import { getAllDamageReports, assignDamageReport, resolveDamageReport, getAllUsers } from "../utils/adminApi";
 
+function StatusBadge({ status, label }) {
+  const map = {
+    pending:     { color: "#f4b400", bg: "#2a2200" },
+    assigned:    { color: "#0066b1", bg: "#001a2e" },
+    in_progress: { color: "#1c69d4", bg: "#001a3e" },
+    resolved:    { color: "#0fa336", bg: "#012010" },
+    closed:      { color: "#7e7e7e", bg: "#1a1a1a" },
+  };
+  const s = map[status] || { color: "#7e7e7e", bg: "#1a1a1a" };
+  return (
+    <span style={{ display: "inline-block", padding: "2px 10px", background: s.bg, color: s.color, fontSize: "10px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", border: `1px solid ${s.color}33` }}>
+      {label || status}
+    </span>
+  );
+}
+
 export default function DamageReportsAdmin() {
   const [reports, setReports] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -19,146 +35,105 @@ export default function DamageReportsAdmin() {
     try {
       const response = await getAllDamageReports();
       setReports(response.data.results || response.data);
-    } catch (error) {
-      console.error("Error fetching reports:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error(error); } finally { setLoading(false); }
   };
 
   const fetchWorkers = async () => {
     try {
       const response = await getAllUsers();
       const allUsers = response.data.results || response.data;
-      const officers = allUsers.filter((user) => user.role === "water_officer");
-      setWorkers(officers);
-    } catch (error) {
-      console.error("Error fetching worker list:", error);
-    }
+      setWorkers(allUsers.filter((u) => u.role === "water_officer"));
+    } catch (error) { console.error(error); }
   };
 
-  const handleAssign = async (reportId) => {
+  const handleAssign = async (id) => {
     try {
-      await assignDamageReport(reportId, { worker_id: assignWorkerId });
+      await assignDamageReport(id, { worker_id: assignWorkerId });
       setSelectedReport(null);
       setAssignWorkerId("");
       fetchReports();
-    } catch (error) {
-      console.error("Error assigning report:", error);
-      alert("Kuna hitilafu wakati wa kupeana ripoti.");
-    }
+    } catch (error) { alert("Kuna hitilafu wakati wa kupeana ripoti."); }
   };
 
-  const handleResolve = async (reportId) => {
+  const handleResolve = async (id) => {
     try {
-      await resolveDamageReport(reportId, { notes: resolutionNotes });
+      await resolveDamageReport(id, { notes: resolutionNotes });
       setSelectedReport(null);
       setResolutionNotes("");
       fetchReports();
-    } catch (error) {
-      console.error("Error resolving report:", error);
-      alert("Kuna hitilafu wakati wa kutatua ripoti.");
-    }
+    } catch (error) { alert("Kuna hitilafu wakati wa kutatua ripoti."); }
   };
 
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Ripoti za Uharibifu</h2>
+      <div style={{ marginBottom: "40px" }} className="animate-fade-in-up">
+        <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>Usimamizi wa Shughuli</p>
+        <h1 style={{ color: "#ffffff", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700, textTransform: "uppercase", lineHeight: 1.05 }}>Ripoti za Uharibifu</h1>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-        <table className="w-full min-w-[900px]">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chanzo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ripoti</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kipaumbele</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hali</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Imepewa</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vitendo</th>
+      <div style={{ border: "1px solid #3c3c3c", overflowX: "auto", marginBottom: "40px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid #3c3c3c", background: "#0d0d0d" }}>
+              {["Chanzo", "Ripoti", "Kipaumbele", "Hali", "Imepewa", "Vitendo"].map((h) => (
+                <th key={h} style={{ padding: "14px 20px", textAlign: "left", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
-            {reports.map((report) => (
-              <tr key={report.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium text-gray-900">{report.water_source?.name}</td>
-                <td className="px-6 py-4 text-gray-600">{report.title}</td>
-                <td className="px-6 py-4 capitalize text-gray-600">{report.priority}</td>
-                <td className="px-6 py-4 capitalize text-gray-600">{report.status}</td>
-                <td className="px-6 py-4 text-gray-600">{report.assigned_to?.username || "-"}</td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => setSelectedReport(report)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      Hariri
-                    </button>
-                    {report.status !== "resolved" && (
-                      <button
-                        onClick={() => handleResolve(report.id)}
-                        className="text-green-600 hover:text-green-800"
-                      >
-                        Tatua
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+          <tbody>
+            {loading ? (
+              [1,2,3].map(i => (
+                <tr key={i} style={{ borderBottom: "1px solid #1a1a1a" }}>
+                  {[1,2,3,4,5,6].map(j => <td key={j} style={{ padding: "16px 20px" }}><div style={{ height: "12px", background: "#1a1a1a", width: "70%" }} /></td>)}
+                </tr>
+              ))
+            ) : reports.length === 0 ? (
+              <tr><td colSpan={6} style={{ padding: "48px 20px", textAlign: "center", color: "#7e7e7e", fontWeight: 300 }}>Hakuna ripoti zilizosajiliwa.</td></tr>
+            ) : (
+              reports.map((r) => (
+                <tr key={r.id} style={{ borderBottom: "1px solid #1a1a1a", transition: "background 0.12s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#0d0d0d")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                  <td style={{ padding: "16px 20px", color: "#ffffff", fontSize: "14px", fontWeight: 700 }}>{r.water_source?.name || "—"}</td>
+                  <td style={{ padding: "16px 20px", color: "#bbbbbb", fontSize: "13px", fontWeight: 300 }}>{r.title}</td>
+                  <td style={{ padding: "16px 20px", color: "#bbbbbb", fontSize: "13px", fontWeight: 300, textTransform: "capitalize" }}>{r.priority}</td>
+                  <td style={{ padding: "16px 20px" }}><StatusBadge status={r.status} /></td>
+                  <td style={{ padding: "16px 20px", color: "#bbbbbb", fontSize: "13px", fontWeight: 300 }}>{r.assigned_to?.username || "—"}</td>
+                  <td style={{ padding: "16px 20px" }}>
+                    <div style={{ display: "flex", gap: "12px", flexDirection: "column" }}>
+                      <button onClick={() => setSelectedReport(r)} style={{ color: "#0066b1", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer", textAlign: "left" }}>Hariri</button>
+                      {r.status !== "resolved" && (
+                        <button onClick={() => handleResolve(r.id)} style={{ color: "#0fa336", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer", textAlign: "left" }}>Tatua</button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {selectedReport && (
-        <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Peana Ripoti kwa Msimamizi</h3>
+        <div style={{ background: "#0d0d0d", padding: "32px", border: "1px solid #3c3c3c", maxWidth: "800px" }} className="animate-fade-in-up">
+          <h3 style={{ color: "#ffffff", fontSize: "20px", fontWeight: 700, textTransform: "uppercase", marginBottom: "24px" }}>Peana Ripoti kwa Msimamizi</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Chagua Msimamizi</label>
-              <select
-                value={assignWorkerId}
-                onChange={(e) => setAssignWorkerId(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-              >
+              <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Chagua Msimamizi</label>
+              <select value={assignWorkerId} onChange={(e) => setAssignWorkerId(e.target.value)} className="bmw-input">
                 <option value="">Chagua</option>
-                {workers.map((worker) => (
-                  <option key={worker.id} value={worker.id}>{worker.username}</option>
-                ))}
+                {workers.map(w => <option key={w.id} value={w.id}>{w.username}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Maoni ya utatuzi</label>
-              <textarea
-                value={resolutionNotes}
-                onChange={(e) => setResolutionNotes(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                rows="3"
-              />
+              <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maoni ya utatuzi</label>
+              <textarea value={resolutionNotes} onChange={(e) => setResolutionNotes(e.target.value)} className="bmw-input" rows="3" />
             </div>
           </div>
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={() => setSelectedReport(null)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              Funga
-            </button>
-            {assignWorkerId && (
-              <button
-                onClick={() => handleAssign(selectedReport.id)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Peana
-              </button>
-            )}
-            <button
-              onClick={() => handleResolve(selectedReport.id)}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            >
-              Tatua
-            </button>
+          <div style={{ display: "flex", gap: "16px", marginTop: "24px" }}>
+            <button onClick={() => setSelectedReport(null)} className="btn-m-outline flex-1" style={{ height: "44px", fontSize: "12px" }}>Funga</button>
+            {assignWorkerId && <button onClick={() => handleAssign(selectedReport.id)} className="btn-m-primary flex-1" style={{ height: "44px", fontSize: "12px" }}>Peana</button>}
+            <button onClick={() => handleResolve(selectedReport.id)} className="btn-m-primary flex-1" style={{ height: "44px", fontSize: "12px", background: "#0fa336", borderColor: "#0fa336" }}>Tatua</button>
           </div>
         </div>
       )}
