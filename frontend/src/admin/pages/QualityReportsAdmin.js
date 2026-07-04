@@ -110,41 +110,41 @@ export default function QualityReportsAdmin() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Chanzo cha maji</label>
-                  <select value={formData.water_source_id} onChange={(e) => setFormData({...formData, water_source_id: e.target.value})} required className="bmw-input">
+                  <select value={formData.water_source_id} onChange={(e) => setFormData({...formData, water_source_id: e.target.value})} required className="m-select">
                     <option value="">Chagua chanzo</option>
                     {sources.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>pH</label>
-                  <input type="number" step="0.01" value={formData.ph_level} onChange={(e) => setFormData({...formData, ph_level: e.target.value})} required className="bmw-input" />
+                  <input type="number" step="0.01" value={formData.ph_level} onChange={(e) => setFormData({...formData, ph_level: e.target.value})} required className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Vimelea</label>
-                  <input type="number" value={formData.bacteria_count} onChange={(e) => setFormData({...formData, bacteria_count: e.target.value})} required className="bmw-input" />
+                  <input type="number" value={formData.bacteria_count} onChange={(e) => setFormData({...formData, bacteria_count: e.target.value})} required className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Iron</label>
-                  <input type="number" step="0.001" value={formData.iron_level} onChange={(e) => setFormData({...formData, iron_level: e.target.value})} className="bmw-input" />
+                  <input type="number" step="0.001" value={formData.iron_level} onChange={(e) => setFormData({...formData, iron_level: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Turbidity</label>
-                  <input type="number" step="0.01" value={formData.turbidity} onChange={(e) => setFormData({...formData, turbidity: e.target.value})} className="bmw-input" />
+                  <input type="number" step="0.01" value={formData.turbidity} onChange={(e) => setFormData({...formData, turbidity: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Clorine</label>
-                  <input type="number" step="0.001" value={formData.chlorine_level} onChange={(e) => setFormData({...formData, chlorine_level: e.target.value})} className="bmw-input" />
+                  <input type="number" step="0.001" value={formData.chlorine_level} onChange={(e) => setFormData({...formData, chlorine_level: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Salama?</label>
-                  <select value={formData.is_safe ? "true" : "false"} onChange={(e) => setFormData({...formData, is_safe: e.target.value === "true"})} className="bmw-input">
+                  <select value={formData.is_safe ? "true" : "false"} onChange={(e) => setFormData({...formData, is_safe: e.target.value === "true"})} className="m-select">
                     <option value="true">Ndiyo</option>
                     <option value="false">Hapana</option>
                   </select>
                 </div>
                 <div style={{ gridColumn: "span 1" }}>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maelezo</label>
-                  <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="bmw-input" rows="3" />
+                  <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="m-textarea" rows="3" />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>

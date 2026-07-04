@@ -120,14 +120,14 @@ export default function DamageReportsAdmin() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Chagua Msimamizi</label>
-              <select value={assignWorkerId} onChange={(e) => setAssignWorkerId(e.target.value)} className="bmw-input">
+              <select value={assignWorkerId} onChange={(e) => setAssignWorkerId(e.target.value)} className="m-select">
                 <option value="">Chagua</option>
                 {workers.map(w => <option key={w.id} value={w.id}>{w.username}</option>)}
               </select>
             </div>
             <div>
               <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maoni ya utatuzi</label>
-              <textarea value={resolutionNotes} onChange={(e) => setResolutionNotes(e.target.value)} className="bmw-input" rows="3" />
+              <textarea value={resolutionNotes} onChange={(e) => setResolutionNotes(e.target.value)} className="m-textarea" rows="3" />
             </div>
           </div>
           <div style={{ display: "flex", gap: "16px", marginTop: "24px" }}>

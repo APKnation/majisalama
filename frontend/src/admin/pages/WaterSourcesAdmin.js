@@ -146,11 +146,11 @@ export default function WaterSourcesAdmin() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Jina</label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="bmw-input" />
+                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Aina</label>
-                  <select value={formData.source_type} onChange={(e) => setFormData({...formData, source_type: e.target.value})} className="bmw-input">
+                  <select value={formData.source_type} onChange={(e) => setFormData({...formData, source_type: e.target.value})} className="m-select">
                     <option value="shallow_well">Kisima cha Juu</option>
                     <option value="deep_well">Kisima cha Kina</option>
                     <option value="spring">Chemchem</option>
@@ -162,14 +162,14 @@ export default function WaterSourcesAdmin() {
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Kijiji</label>
-                  <select value={formData.village_id} onChange={(e) => setFormData({...formData, village_id: e.target.value})} className="bmw-input">
+                  <select value={formData.village_id} onChange={(e) => setFormData({...formData, village_id: e.target.value})} className="m-select">
                     <option value="">Chagua kijiji</option>
                     {villages.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Hali</label>
-                  <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="bmw-input">
+                  <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="m-select">
                     <option value="safe">Salama</option>
                     <option value="caution">Tahadhari</option>
                     <option value="unsafe">Hatarini</option>
@@ -179,19 +179,19 @@ export default function WaterSourcesAdmin() {
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Latitudo</label>
-                  <input type="number" step="any" value={formData.latitude} onChange={(e) => setFormData({...formData, latitude: e.target.value})} className="bmw-input" />
+                  <input type="number" step="any" value={formData.latitude} onChange={(e) => setFormData({...formData, latitude: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Longitudo</label>
-                  <input type="number" step="any" value={formData.longitude} onChange={(e) => setFormData({...formData, longitude: e.target.value})} className="bmw-input" />
+                  <input type="number" step="any" value={formData.longitude} onChange={(e) => setFormData({...formData, longitude: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>pH</label>
-                  <input type="number" step="0.01" value={formData.ph_level} onChange={(e) => setFormData({...formData, ph_level: e.target.value})} className="bmw-input" />
+                  <input type="number" step="0.01" value={formData.ph_level} onChange={(e) => setFormData({...formData, ph_level: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Vimelea (CFU/100ml)</label>
-                  <input type="number" value={formData.bacteria_count} onChange={(e) => setFormData({...formData, bacteria_count: e.target.value})} className="bmw-input" />
+                  <input type="number" value={formData.bacteria_count} onChange={(e) => setFormData({...formData, bacteria_count: e.target.value})} className="m-input" />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>

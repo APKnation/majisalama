@@ -115,27 +115,27 @@ export default function VillagesAdmin() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Jina</label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="bmw-input" />
+                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Wilaya</label>
-                  <input type="text" value={formData.district} onChange={(e) => setFormData({...formData, district: e.target.value})} className="bmw-input" />
+                  <input type="text" value={formData.district} onChange={(e) => setFormData({...formData, district: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Mkoa</label>
-                  <input type="text" value={formData.region} onChange={(e) => setFormData({...formData, region: e.target.value})} className="bmw-input" />
+                  <input type="text" value={formData.region} onChange={(e) => setFormData({...formData, region: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Idadi ya watu</label>
-                  <input type="number" value={formData.population} onChange={(e) => setFormData({...formData, population: e.target.value})} className="bmw-input" />
+                  <input type="number" value={formData.population} onChange={(e) => setFormData({...formData, population: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Latitudo</label>
-                  <input type="number" step="any" value={formData.latitude} onChange={(e) => setFormData({...formData, latitude: e.target.value})} className="bmw-input" />
+                  <input type="number" step="any" value={formData.latitude} onChange={(e) => setFormData({...formData, latitude: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Longitudo</label>
-                  <input type="number" step="any" value={formData.longitude} onChange={(e) => setFormData({...formData, longitude: e.target.value})} className="bmw-input" />
+                  <input type="number" step="any" value={formData.longitude} onChange={(e) => setFormData({...formData, longitude: e.target.value})} className="m-input" />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
