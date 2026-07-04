@@ -3,31 +3,21 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Link } from "react-router-dom";
 import api from "../utils/api";
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case "safe":
-      return "bg-green-500";
-    case "caution":
-      return "bg-yellow-500";
-    case "unsafe":
-      return "bg-red-500";
-    default:
-      return "bg-gray-500";
-  }
-};
-
-const getStatusText = (status) => {
-  switch (status) {
-    case "safe":
-      return "Salama";
-    case "caution":
-      return "Tahadhari";
-    case "unsafe":
-      return "Hatarini";
-    default:
-      return "Haijulikani";
-  }
-};
+function StatusBadge({ status, label }) {
+  const map = {
+    safe:         { color: "#0fa336", bg: "#012010" },
+    caution:      { color: "#f4b400", bg: "#2a2200" },
+    unsafe:       { color: "#e22718", bg: "#2e0800" },
+    under_repair: { color: "#1c69d4", bg: "#001a3e" },
+    dry:          { color: "#7e7e7e", bg: "#1a1a1a" },
+  };
+  const s = map[status] || { color: "#7e7e7e", bg: "#1a1a1a" };
+  return (
+    <span style={{ display: "inline-block", padding: "2px 10px", background: s.bg, color: s.color, fontSize: "10px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", border: `1px solid ${s.color}33` }}>
+      {label || status}
+    </span>
+  );
+}
 
 export default function MapView() {
   const [waterSources, setWaterSources] = useState([]);
@@ -41,103 +31,64 @@ export default function MapView() {
     try {
       const response = await api.get("/water-sources/");
       setWaterSources(response.data.results || response.data);
-    } catch (error) {
-      console.error("Error fetching water sources:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error(error); } finally { setLoading(false); }
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-80 bg-white shadow-lg overflow-y-auto">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-bold text-gray-800">Vyanzo vya Maji</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Angalia vyanzo vilivyo karibu
-          </p>
+    <div style={{ display: "flex", height: "100vh", background: "#000000", color: "#ffffff", overflow: "hidden" }}>
+      <div style={{ width: "380px", borderRight: "1px solid #3c3c3c", display: "flex", flexDirection: "column", background: "#0d0d0d" }}>
+        <div style={{ padding: "32px 24px", borderBottom: "1px solid #3c3c3c" }}>
+          <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Ramani</p>
+          <h1 style={{ fontSize: "24px", fontWeight: 700, textTransform: "uppercase" }}>Vyanzo vya Maji</h1>
+          <p style={{ color: "#7e7e7e", fontSize: "12px", marginTop: "4px" }}>Angalia vyanzo vilivyo karibu.</p>
         </div>
-
-        <div className="divide-y divide-gray-100">
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
           {loading ? (
-            <div className="p-4 text-center text-gray-500">Inapakia...</div>
+            <div style={{ padding: "24px", color: "#7e7e7e" }}>Inapakia...</div>
           ) : waterSources.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              Hakuna vyanzo vilivyopatikana
-            </div>
+            <div style={{ padding: "24px", color: "#7e7e7e" }}>Hakuna vyanzo vilivyopatikana.</div>
           ) : (
             waterSources.map((source) => (
-              <div key={source.id} className="p-4 hover:bg-gray-50">
-                <div className="flex items-start justify-between">
+              <div key={source.id} style={{ padding: "20px 24px", borderBottom: "1px solid #1a1a1a", transition: "background 0.15s" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#1a1a1a")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
                   <div>
-                    <h3 className="font-semibold text-gray-900">
-                      {source.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {source.village?.name}
-                    </p>
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-white mt-2 ${getStatusColor(source.status)}`}
-                    >
-                      {getStatusText(source.status)}
-                    </span>
+                    <h3 style={{ color: "#ffffff", fontSize: "15px", fontWeight: 700, textTransform: "uppercase" }}>{source.name}</h3>
+                    <p style={{ color: "#7e7e7e", fontSize: "12px" }}>{source.village?.name}</p>
                   </div>
+                  <StatusBadge status={source.status} label={source.status_display} />
                 </div>
-                <div className="mt-2">
-                  <Link
-                    to={`/source/${source.id}`}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    Angalia Zaidi →
-                  </Link>
-                </div>
+                <Link to={`/source/${source.id}`} style={{ color: "#0066b1", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none", display: "inline-block" }}>
+                  Angalia Zaidi →
+                </Link>
               </div>
             ))
           )}
         </div>
       </div>
 
-      {/* Map */}
-      <div className="flex-1 relative">
-        <MapContainer
-          center={[-6.8, 39.28]}
-          zoom={12}
-          className="h-full w-full"
-        >
-          <TileLayer
-            attribution="&copy; OpenStreetMap"
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-
+      <div style={{ flex: 1, position: "relative" }}>
+        <MapContainer center={[-6.8, 39.28]} zoom={12} style={{ height: "100%", width: "100%", zIndex: 1 }}>
+          <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {waterSources.map(
             (source) =>
-              source.location && (
-                <Marker
-                  key={source.id}
-                  position={[
-                    source.location.coordinates[1],
-                    source.location.coordinates[0],
-                  ]}
-                >
+              source.latitude && source.longitude && (
+                <Marker key={source.id} position={[source.latitude, source.longitude]}>
                   <Popup>
-                    <div className="p-2 min-w-[200px]">
-                      <h3 className="font-bold text-lg mb-1">{source.name}</h3>
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white mb-2 ${getStatusColor(source.status)}`}
-                      >
-                        {getStatusText(source.status)}
-                      </span>
-                      <Link
-                        to={`/source/${source.id}`}
-                        className="block w-full text-center bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
-                      >
+                    <div style={{ minWidth: "160px" }}>
+                      <h3 style={{ fontWeight: "bold", fontSize: "14px", marginBottom: "8px" }}>{source.name}</h3>
+                      <div style={{ marginBottom: "12px" }}>
+                        <span style={{ fontSize: "11px", color: "#666" }}>{source.status_display}</span>
+                      </div>
+                      <Link to={`/source/${source.id}`} style={{ display: "block", textAlign: "center", background: "#0066b1", color: "#fff", padding: "6px 12px", borderRadius: "4px", fontSize: "12px", textDecoration: "none" }}>
                         Angalia Maelezo
                       </Link>
                     </div>
                   </Popup>
                 </Marker>
-              ),
+              )
           )}
         </MapContainer>
       </div>

@@ -23,28 +23,17 @@ export default function Messages() {
       const response = await api.get(`/messages/?folder=${folder}`);
       setMessages(response.data.results || response.data);
       setSelectedMessage(null);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    } finally {
-      setFetching(false);
-    }
+    } catch (error) { console.error(error); } finally { setFetching(false); }
   };
 
   const fetchRecipients = async () => {
     try {
-      // The backend now filters this list based on the user's role visibility rules
       const response = await api.get("/users/");
-      // Exclude self from recipients
-      const availableRecipients = (response.data.results || response.data).filter(r => r.id !== user.id);
-      setRecipients(availableRecipients);
-    } catch (error) {
-      console.error("Error fetching recipients:", error);
-    }
+      setRecipients((response.data.results || response.data).filter(r => r.id !== user.id));
+    } catch (error) { console.error(error); }
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -52,143 +41,89 @@ export default function Messages() {
     try {
       await api.post("/messages/", formData);
       setFormData({ recipient_id: "", subject: "", body: "", related_report_id: "" });
-      setFolder("sent"); // This will trigger useEffect to fetch sent messages
-    } catch (error) {
-      console.error("Error sending message:", error);
-      alert("Kuna hitilafu wakati wa kutuma ujumbe.");
-    } finally {
-      setLoading(false);
-    }
+      setFolder("sent");
+    } catch (error) { alert("Kuna hitilafu wakati wa kutuma ujumbe."); } finally { setLoading(false); }
   };
 
-  // Helper to format role names beautifully
   const formatRole = (role) => {
-    const roles = {
-      'admin': 'Msimamizi',
-      'district_officer': 'Afisa wa Wilaya',
-      'village_leader': 'Kiongozi wa Kijiji',
-      'water_officer': 'Afisa wa Maji',
-      'citizen': 'Mwananchi'
-    };
+    const roles = { 'admin': 'Msimamizi', 'district_officer': 'Afisa wa Wilaya', 'village_leader': 'Kiongozi wa Kijiji', 'water_officer': 'Afisa wa Maji', 'citizen': 'Mwananchi' };
     return roles[role] || role;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 animate-fade-in-up">
+    <div style={{ background: "#000000", minHeight: "100vh", color: "#ffffff" }}>
+      <div className="m-stripe" />
+      <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "40px 32px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "40px", flexWrap: "wrap", gap: "20px" }} className="animate-fade-in-up">
           <div>
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Kituo cha Ujumbe</h1>
-            <p className="mt-2 text-lg text-gray-600">Mawasiliano na ushirikiano kati ya wadau wa sekta ya maji.</p>
+            <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>Mawasiliano</p>
+            <h1 style={{ color: "#ffffff", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700, textTransform: "uppercase", lineHeight: 1.05 }}>Kituo cha Ujumbe</h1>
           </div>
-          <div className="flex bg-white rounded-xl shadow-sm border border-gray-100 p-1">
-            <button
-              onClick={() => setFolder("inbox")}
-              className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                folder === "inbox" ? "bg-blue-600 text-white shadow-md transform scale-105" : "text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              Kikasha
-            </button>
-            <button
-              onClick={() => setFolder("sent")}
-              className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                folder === "sent" ? "bg-blue-600 text-white shadow-md transform scale-105" : "text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              Uliotumwa
-            </button>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button onClick={() => setFolder("inbox")} className={folder === "inbox" ? "btn-m-primary" : "btn-m-outline"} style={{ height: "40px", padding: "0 24px", fontSize: "12px" }}>Kikasha</button>
+            <button onClick={() => setFolder("sent")} className={folder === "sent" ? "btn-m-primary" : "btn-m-outline"} style={{ height: "40px", padding: "0 24px", fontSize: "12px" }}>Uliotumwa</button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Messages List & Viewer (Left Side) */}
-          <div className="lg:col-span-8 flex flex-col h-[700px] bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in-up delay-100">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 flex flex-col h-[700px] bg-[#0d0d0d] border border-[#3c3c3c] animate-fade-in-up">
             {selectedMessage ? (
-              // Message Viewer
-              <div className="flex flex-col h-full bg-gradient-to-b from-blue-50/50 to-white">
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-                  <button 
-                    onClick={() => setSelectedMessage(null)}
-                    className="flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Rudi Nyuma
+              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <div style={{ padding: "20px 24px", borderBottom: "1px solid #3c3c3c", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <button onClick={() => setSelectedMessage(null)} style={{ color: "#0066b1", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent" }}>
+                    ← Rudi Nyuma
                   </button>
-                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                    {new Date(selectedMessage.created_at).toLocaleString("sw-TZ")}
-                  </span>
+                  <span style={{ color: "#7e7e7e", fontSize: "11px", fontWeight: 300 }}>{new Date(selectedMessage.created_at).toLocaleString("sw-TZ")}</span>
                 </div>
-                <div className="p-8 overflow-y-auto">
-                  <h2 className="text-3xl font-extrabold text-gray-900 mb-6 leading-tight">{selectedMessage.subject || "(Hakuna kichwa)"}</h2>
-                  
-                  <div className="flex items-center mb-8 pb-8 border-b border-gray-100">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div style={{ padding: "32px 24px", overflowY: "auto", flex: 1 }}>
+                  <h2 style={{ color: "#ffffff", fontSize: "24px", fontWeight: 700, textTransform: "uppercase", marginBottom: "24px" }}>{selectedMessage.subject || "(Hakuna kichwa)"}</h2>
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: "32px", paddingBottom: "24px", borderBottom: "1px solid #1a1a1a" }}>
+                    <div style={{ width: "40px", height: "40px", background: "#1a1a1a", border: "1px solid #3c3c3c", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffffff", fontSize: "14px", fontWeight: 700 }}>
                       {(folder === "inbox" ? selectedMessage.sender?.username : selectedMessage.recipient?.username).charAt(0).toUpperCase()}
                     </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-semibold text-gray-900">
+                    <div style={{ marginLeft: "16px" }}>
+                      <p style={{ color: "#bbbbbb", fontSize: "13px", fontWeight: 300 }}>
                         {folder === "inbox" ? "Kutoka: " : "Kwenda: "}
-                        <span className="text-blue-600">{folder === "inbox" ? selectedMessage.sender?.username : selectedMessage.recipient?.username}</span>
+                        <span style={{ color: "#ffffff", fontWeight: 700 }}>{folder === "inbox" ? selectedMessage.sender?.username : selectedMessage.recipient?.username}</span>
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">Mhusika wa Mfumo</p>
                     </div>
                   </div>
-
-                  <div className="prose max-w-none text-gray-700 leading-relaxed text-lg whitespace-pre-wrap">
+                  <div style={{ color: "#bbbbbb", fontSize: "15px", lineHeight: 1.6, fontWeight: 300, whiteSpace: "pre-wrap" }}>
                     {selectedMessage.body}
                   </div>
                 </div>
               </div>
             ) : (
-              // Messages List
-              <div className="flex flex-col h-full">
-                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                  <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                    <span className={`w-2 h-6 rounded-full mr-3 ${folder === 'inbox' ? 'bg-blue-500' : 'bg-green-500'}`}></span>
-                    {folder === "inbox" ? "Ujumbe Ulioingia" : "Ujumbe Uliotumwa"}
-                  </h2>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <div style={{ padding: "24px", borderBottom: "1px solid #3c3c3c", display: "flex", alignItems: "center" }}>
+                  <div style={{ width: "8px", height: "8px", background: folder === "inbox" ? "#0066b1" : "#0fa336", marginRight: "12px" }} />
+                  <h2 style={{ color: "#ffffff", fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>{folder === "inbox" ? "Ujumbe Ulioingia" : "Ujumbe Uliotumwa"}</h2>
                 </div>
-                <div className="flex-1 overflow-y-auto">
+                <div style={{ flex: 1, overflowY: "auto" }}>
                   {fetching ? (
-                    <div className="p-8 space-y-4">
-                      {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-24 bg-gray-100 rounded-xl animate-pulse"></div>
-                      ))}
+                    <div className="space-y-px" style={{ background: "#3c3c3c" }}>
+                      {[1,2,3,4].map(i => <div key={i} style={{ height: "100px", background: "#0d0d0d" }} />)}
                     </div>
                   ) : messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                      <span className="text-6xl mb-4">📭</span>
-                      <p className="text-lg font-medium">Kikasha kipo wazi kwa sasa.</p>
-                    </div>
+                    <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#7e7e7e", fontWeight: 300 }}>Kikasha kipo wazi.</div>
                   ) : (
-                    <div className="divide-y divide-gray-50">
-                      {messages.map((message) => (
-                        <button
-                          key={message.id}
-                          onClick={() => setSelectedMessage(message)}
-                          className="w-full text-left p-6 hover:bg-blue-50/50 transition-colors duration-200 group relative flex flex-col"
+                    <div className="space-y-px" style={{ background: "#3c3c3c" }}>
+                      {messages.map((m) => (
+                        <div key={m.id} onClick={() => setSelectedMessage(m)} style={{ padding: "24px", background: "#0d0d0d", cursor: "pointer", transition: "background 0.15s" }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = "#1a1a1a")} onMouseLeave={(e) => (e.currentTarget.style.background = "#0d0d0d")}
                         >
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors text-lg truncate pr-4">
-                              {message.subject || "(Hakuna kichwa)"}
-                            </h3>
-                            <span className="text-xs font-semibold text-gray-400 whitespace-nowrap">
-                              {new Date(message.created_at).toLocaleDateString("sw-TZ")}
-                            </span>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                            <h3 style={{ color: "#ffffff", fontSize: "16px", fontWeight: 700, textTransform: "uppercase" }}>{m.subject || "(Hakuna kichwa)"}</h3>
+                            <span style={{ color: "#7e7e7e", fontSize: "11px", fontWeight: 300 }}>{new Date(m.created_at).toLocaleDateString("sw-TZ")}</span>
                           </div>
-                          <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-3">
-                            {message.body}
-                          </p>
-                          <div className="flex items-center mt-auto">
-                            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs font-bold mr-2">
-                              {(folder === "inbox" ? message.sender?.username : message.recipient?.username).charAt(0).toUpperCase()}
+                          <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300, marginBottom: "16px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{m.body}</p>
+                          <div style={{ display: "flex", alignItems: "center" }}>
+                            <div style={{ width: "24px", height: "24px", background: "#1a1a1a", display: "flex", alignItems: "center", justifyContent: "center", color: "#7e7e7e", fontSize: "10px", fontWeight: 700 }}>
+                              {(folder === "inbox" ? m.sender?.username : m.recipient?.username).charAt(0).toUpperCase()}
                             </div>
-                            <span className="text-xs font-medium text-gray-600">
-                              {folder === "inbox" ? message.sender?.username : message.recipient?.username}
-                            </span>
+                            <span style={{ color: "#7e7e7e", fontSize: "12px", marginLeft: "10px" }}>{folder === "inbox" ? m.sender?.username : m.recipient?.username}</span>
                           </div>
-                        </button>
+                        </div>
                       ))}
                     </div>
                   )}
@@ -197,71 +132,29 @@ export default function Messages() {
             )}
           </div>
 
-          {/* Compose Form (Right Side) */}
           <div className="lg:col-span-4 flex flex-col">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 animate-fade-in-up delay-200 sticky top-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="w-2 h-6 bg-purple-500 rounded-full mr-3"></span>
-                Tuma Ujumbe Mpya
+            <div style={{ background: "#0d0d0d", border: "1px solid #3c3c3c", padding: "32px", position: "sticky", top: "32px" }}>
+              <h2 style={{ color: "#ffffff", fontSize: "18px", fontWeight: 700, textTransform: "uppercase", marginBottom: "32px", display: "flex", alignItems: "center" }}>
+                <div style={{ width: "8px", height: "8px", background: "#0066b1", marginRight: "12px" }} /> Tuma Ujumbe Mpya
               </h2>
-              
-              <form className="space-y-5" onSubmit={sendMessage}>
-                <div className="group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">Mpokeaji</label>
-                  <select
-                    name="recipient_id"
-                    value={formData.recipient_id}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white outline-none transition-all duration-300 shadow-sm appearance-none"
-                    style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem top 50%', backgroundSize: '0.65rem auto' }}
-                  >
+              <form onSubmit={sendMessage} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <div>
+                  <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Mpokeaji</label>
+                  <select name="recipient_id" value={formData.recipient_id} onChange={handleChange} required className="bmw-input">
                     <option value="" disabled>Chagua mdau</option>
-                    {recipients.map((recipient) => (
-                      <option key={recipient.id} value={recipient.id}>
-                        {recipient.username} - {formatRole(recipient.role)} {recipient.village ? `(${recipient.village.name})` : ''}
-                      </option>
-                    ))}
+                    {recipients.map(r => <option key={r.id} value={r.id}>{r.username} - {formatRole(r.role)} {r.village ? `(${r.village.name})` : ''}</option>)}
                   </select>
                 </div>
-
-                <div className="group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">Kichwa cha Habari</label>
-                  <input
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    placeholder="Mfano: Ripoti ya Uchafuzi..."
-                    className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white outline-none transition-all duration-300 shadow-sm"
-                  />
+                <div>
+                  <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Kichwa cha Habari</label>
+                  <input name="subject" value={formData.subject} onChange={handleChange} placeholder="Mfano: Ripoti ya Uchafuzi..." className="bmw-input" />
                 </div>
-
-                <div className="group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">Maelezo</label>
-                  <textarea
-                    name="body"
-                    value={formData.body}
-                    onChange={handleChange}
-                    rows={6}
-                    required
-                    placeholder="Andika ujumbe wako hapa kwa kina..."
-                    className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white outline-none transition-all duration-300 shadow-sm resize-none"
-                  />
+                <div>
+                  <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maelezo</label>
+                  <textarea name="body" value={formData.body} onChange={handleChange} rows={6} required placeholder="Andika ujumbe wako hapa..." className="bmw-input" />
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full relative flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-4 rounded-xl font-bold text-[15px] shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 transform hover:-translate-y-0.5 transition-all duration-200 active:translate-y-0 mt-8 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                      Tuma Ujumbe Sasa
-                    </>
-                  )}
+                <button type="submit" disabled={loading} className="btn-m-primary" style={{ height: "48px", marginTop: "12px", opacity: loading ? 0.7 : 1 }}>
+                  {loading ? "Inatuma..." : "Tuma Ujumbe"}
                 </button>
               </form>
             </div>
