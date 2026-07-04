@@ -1,176 +1,89 @@
-// frontend/src/components/Navbar.jsx
-
+// src/components/Navbar.jsx — BMW M Design System
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
-  const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl">💧</span>
-              <span className="text-lg sm:text-xl font-bold text-gray-900">
-                WaterTrack
-              </span>
-            </Link>
-          </div>
+    <nav style={{ background: "#000000", borderBottom: "1px solid #3c3c3c", position: "sticky", top: 0, zIndex: 40 }}>
+      <div className="m-stripe" />
+      <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "0 32px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-2 lg:gap-4">
-            <Link
-              to="/"
-              className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Nyumbani
-            </Link>
-            <Link
-              to="/map"
-              className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Ramani
-            </Link>
+        {/* Brand */}
+        <Link to="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
+          <div className="m-stripe" style={{ width: "28px", height: "3px" }} />
+          <span style={{ color: "#ffffff", fontSize: "12px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+            Maji Salama
+          </span>
+        </Link>
 
-            {user ? (
-              <>
-                {isAdmin() && (
-                  <Link
-                    to="/admin"
-                    className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition"
-                  >
-                    Admin Panel
-                  </Link>
-                )}
+        {/* Desktop */}
+        <div className="hidden md:flex items-center gap-6">
+          {[{ to: "/", label: "Nyumbani" }, { to: "/map", label: "Ramani" }].map(({ to, label }) => (
+            <Link key={to} to={to} style={{ color: "#7e7e7e", fontSize: "13px", letterSpacing: "0.5px", textDecoration: "none", transition: "color 0.15s" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#7e7e7e")}
+            >{label}</Link>
+          ))}
 
-                <Link
-                  to="/report"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
-                >
-                  Ripoti Uharibifu
-                </Link>
-
-                <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
-                  <span className="text-sm text-gray-600">{user.username}</span>
-                  <button
-                    onClick={logout}
-                    className="text-red-600 hover:text-red-800 text-sm font-medium"
-                  >
-                    Toka
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Ingia
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
-                >
-                  Jiunge
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
-            aria-label="Toggle menu"
-          >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          {user ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "16px", borderLeft: "1px solid #3c3c3c", paddingLeft: "16px" }}>
+              {isAdmin?.() && (
+                <Link to="/admin" className="btn-m-outline" style={{ height: "36px", padding: "0 16px", fontSize: "11px" }}>Admin</Link>
               )}
-            </svg>
-          </button>
+              <Link to="/report" className="btn-m-primary" style={{ height: "36px", padding: "0 16px", fontSize: "11px" }}>Ripoti</Link>
+              <span style={{ color: "#7e7e7e", fontSize: "13px", fontWeight: 300 }}>{user.username}</span>
+              <button onClick={logout} style={{ color: "#e22718", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>
+                Toka
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <Link to="/login" style={{ color: "#7e7e7e", fontSize: "13px", textDecoration: "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#7e7e7e")}
+              >Ingia</Link>
+              <Link to="/register" className="btn-m-outline" style={{ height: "36px", padding: "0 16px", fontSize: "11px" }}>Jiunge</Link>
+            </div>
+          )}
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 pb-3 space-y-1">
-            <Link
-              to="/"
-              className="block px-3 py-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Nyumbani
-            </Link>
-            <Link
-              to="/map"
-              className="block px-3 py-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Ramani
-            </Link>
-
-            {user ? (
-              <>
-                {isAdmin() && (
-                  <Link
-                    to="/admin"
-                    className="block px-3 py-2 rounded-md bg-purple-600 text-white text-sm font-medium hover:bg-purple-700"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Admin Panel
-                  </Link>
-                )}
-
-                <Link
-                  to="/report"
-                  className="block px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Ripoti Uharibifu
-                </Link>
-
-                <div className="px-3 py-2 border-t border-gray-200 pt-3 space-y-2">
-                  <p className="text-sm text-gray-600">Karibu, {user.username}</p>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-red-600 hover:text-red-800 hover:bg-red-50 text-sm font-medium"
-                  >
-                    Toka
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="block px-3 py-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Ingia
-                </Link>
-                <Link
-                  to="/register"
-                  className="block px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Jiunge
-                </Link>
-              </>
-            )}
-          </div>
-        )}
+        {/* Mobile burger */}
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden" style={{ color: "#7e7e7e", background: "transparent", cursor: "pointer" }}>
+          <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {mobileOpen
+              ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
+          </svg>
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div style={{ background: "#0d0d0d", borderTop: "1px solid #3c3c3c", padding: "16px 24px" }}>
+          {[{ to: "/", label: "Nyumbani" }, { to: "/map", label: "Ramani" }].map(({ to, label }) => (
+            <Link key={to} to={to} onClick={() => setMobileOpen(false)}
+              style={{ display: "block", color: "#7e7e7e", fontSize: "13px", padding: "10px 0", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}>
+              {label}
+            </Link>
+          ))}
+          {user ? (
+            <>
+              {isAdmin?.() && <Link to="/admin" onClick={() => setMobileOpen(false)} style={{ display: "block", color: "#0066b1", fontSize: "13px", padding: "10px 0", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}>Admin Panel</Link>}
+              <Link to="/report" onClick={() => setMobileOpen(false)} style={{ display: "block", color: "#ffffff", fontSize: "13px", padding: "10px 0", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}>Ripoti Uharibifu</Link>
+              <button onClick={() => { logout(); setMobileOpen(false); }} style={{ display: "block", color: "#e22718", fontSize: "13px", padding: "10px 0", background: "transparent", cursor: "pointer", width: "100%", textAlign: "left" }}>Toka</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" onClick={() => setMobileOpen(false)} style={{ display: "block", color: "#7e7e7e", fontSize: "13px", padding: "10px 0", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}>Ingia</Link>
+              <Link to="/register" onClick={() => setMobileOpen(false)} style={{ display: "block", color: "#ffffff", fontSize: "13px", padding: "10px 0", textDecoration: "none" }}>Jiunge</Link>
+            </>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
