@@ -145,17 +145,17 @@ export default function AlertsAdmin() {
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div>
                 <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Aina ya arifa</label>
-                <select value={formData.alert_type} onChange={(e) => setFormData({...formData, alert_type: e.target.value})} className="bmw-input">
+                <select value={formData.alert_type} onChange={(e) => setFormData({...formData, alert_type: e.target.value})} className="m-select">
                   {ALERT_TYPES.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div>
                 <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Ujumbe</label>
-                <textarea value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="bmw-input" rows="4" required />
+                <textarea value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="m-textarea" rows="4" required />
               </div>
               <div>
                 <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Chanzo cha maji</label>
-                <select value={formData.water_source_id} onChange={(e) => setFormData({...formData, water_source_id: e.target.value})} className="bmw-input">
+                <select value={formData.water_source_id} onChange={(e) => setFormData({...formData, water_source_id: e.target.value})} className="m-select">
                   <option value="">Haijawekwa</option>
                   {sources.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
