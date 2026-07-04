@@ -144,6 +144,9 @@ class AlertSerializer(serializers.ModelSerializer):
         queryset=WaterSource.objects.all(), source='water_source', write_only=True, required=False, allow_null=True
     )
     alert_type_display = serializers.CharField(source='get_alert_type_display', read_only=True)
+    recipients = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), many=True, required=False
+    )
     
     class Meta:
         model = Alert

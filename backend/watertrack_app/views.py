@@ -241,6 +241,15 @@ class AlertViewSet(viewsets.ModelViewSet):
             return Alert.objects.none()
         return Alert.objects.filter(recipients=user).distinct()
 
+    def perform_create(self, serializer):
+        alert = serializer.save()
+        if not alert.recipients.exists():
+            if alert.water_source and alert.water_source.village:
+                users = User.objects.filter(village=alert.water_source.village)
+                alert.recipients.set(users)
+            else:
+                alert.recipients.set(User.objects.all())
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def custom_login(request):
