@@ -9,32 +9,32 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <h2 className="text-2xl font-bold text-blue-500 mb-4">Maji Salama</h2>
             <p className="text-gray-400 mb-4">
-              Providing reliable water tracking and management solutions for communities across the region. Ensuring access to clean water for everyone.
+              Kutoa suluhisho la uhakika la kufuatilia na kusimamia maji kwa jamii. Kuhakikisha kila mtu anapata maji safi na salama.
             </p>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2 inline-block">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2 inline-block">Viungo vya Haraka</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-400 hover:text-blue-400 transition-colors">Home</Link></li>
-              <li><Link to="/map" className="text-gray-400 hover:text-blue-400 transition-colors">Water Map</Link></li>
-              <li><Link to="/report" className="text-gray-400 hover:text-blue-400 transition-colors">Report Issue</Link></li>
-              <li><Link to="/dashboard" className="text-gray-400 hover:text-blue-400 transition-colors">Dashboard</Link></li>
+              <li><Link to="/" className="text-gray-400 hover:text-blue-400 transition-colors">Mwanzo</Link></li>
+              <li><Link to="/map" className="text-gray-400 hover:text-blue-400 transition-colors">Ramani ya Maji</Link></li>
+              <li><Link to="/report" className="text-gray-400 hover:text-blue-400 transition-colors">Ripoti Tatizo</Link></li>
+              <li><Link to="/dashboard" className="text-gray-400 hover:text-blue-400 transition-colors">Dashibodi</Link></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2 inline-block">Resources</h3>
+            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2 inline-block">Rasilimali</h3>
             <ul className="space-y-2">
-              <li><Link to="/alerts" className="text-gray-400 hover:text-blue-400 transition-colors">Alerts</Link></li>
-              <li><Link to="/login" className="text-gray-400 hover:text-blue-400 transition-colors">Staff Portal</Link></li>
-              <li><a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">Privacy Policy</a></li>
+              <li><Link to="/alerts" className="text-gray-400 hover:text-blue-400 transition-colors">Arifa</Link></li>
+              <li><Link to="/login" className="text-gray-400 hover:text-blue-400 transition-colors">Wafanyakazi</Link></li>
+              <li><a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">Nyaraka</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">Sera ya Faragha</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2 inline-block">Contact Us</h3>
+            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2 inline-block">Wasiliana Nasi</h3>
             <ul className="space-y-2">
               <li className="flex items-center text-gray-400">
                 <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -53,7 +53,7 @@ const Footer = () => {
         
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} Maji Salama. All rights reserved.
+            &copy; {new Date().getFullYear()} Maji Salama. Haki zote zimehifadhiwa.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             {/* Social Icons Placeholders */}
