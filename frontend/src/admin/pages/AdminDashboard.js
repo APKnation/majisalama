@@ -1,290 +1,308 @@
-// src/admin/pages/AdminDashboard.jsx
+// src/admin/pages/AdminDashboard.jsx — BMW M Design System
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "../components/AdminLayout";
-import {
-  getAllWaterSources,
-  getAllDamageReports,
-  getAllQualityReports,
-} from "../utils/adminApi";
+import { getAllWaterSources, getAllDamageReports, getAllQualityReports } from "../utils/adminApi";
 
+// ── Status Badge ─────────────────────────────────────────────────────
+function StatusBadge({ status }) {
+  const map = {
+    pending:     { label: "Inasubiri",   color: "#f4b400", bg: "#2a2200" },
+    assigned:    { label: "Imepewa",     color: "#0066b1", bg: "#001a2e" },
+    in_progress: { label: "Inafanywa",   color: "#1c69d4", bg: "#001a3e" },
+    resolved:    { label: "Imetatuliwa", color: "#0fa336", bg: "#012010" },
+    closed:      { label: "Imefungwa",   color: "#7e7e7e", bg: "#1a1a1a" },
+    safe:        { label: "Salama",      color: "#0fa336", bg: "#012010" },
+    unsafe:      { label: "Hatarini",    color: "#e22718", bg: "#2e0800" },
+    caution:     { label: "Tahadhari",   color: "#f4b400", bg: "#2a2200" },
+  };
+  const s = map[status] || { label: status, color: "#7e7e7e", bg: "#1a1a1a" };
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "2px 10px",
+        background: s.bg,
+        color: s.color,
+        fontSize: "10px",
+        fontWeight: 700,
+        letterSpacing: "1px",
+        textTransform: "uppercase",
+        border: `1px solid ${s.color}33`,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {s.label}
+    </span>
+  );
+}
+
+// ── Stat Card ────────────────────────────────────────────────────────
+function StatCard({ title, value, sub, accent, loading }) {
+  return (
+    <div
+      style={{
+        background: "#000000",
+        borderTop: `2px solid ${accent}`,
+        padding: "24px",
+        transition: "background 0.15s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = "#0d0d0d")}
+      onMouseLeave={(e) => (e.currentTarget.style.background = "#000000")}
+    >
+      <p style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "16px" }}>
+        {title}
+      </p>
+      {loading ? (
+        <div style={{ height: "44px", width: "80px", background: "#1a1a1a" }} />
+      ) : (
+        <p style={{ color: "#ffffff", fontSize: "44px", fontWeight: 700, lineHeight: 1, marginBottom: "8px" }}>
+          {value}
+        </p>
+      )}
+      {sub && <p style={{ color: "#7e7e7e", fontSize: "12px", fontWeight: 300 }}>{sub}</p>}
+    </div>
+  );
+}
+
+// ── Quick Link Card ──────────────────────────────────────────────────
+function QuickCard({ to, abbr, title, desc, accent }) {
+  return (
+    <Link
+      to={to}
+      style={{
+        display: "block",
+        background: "#000000",
+        borderLeft: `2px solid ${accent}`,
+        padding: "20px 24px",
+        textDecoration: "none",
+        transition: "background 0.15s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = "#0d0d0d")}
+      onMouseLeave={(e) => (e.currentTarget.style.background = "#000000")}
+    >
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
+        <div style={{
+          width: "36px", height: "36px", flexShrink: 0,
+          background: `${accent}18`, border: `1px solid ${accent}44`,
+          color: accent,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px",
+        }}>
+          {abbr}
+        </div>
+        <div>
+          <p style={{ color: "#ffffff", fontSize: "13px", fontWeight: 700, letterSpacing: "0.3px", marginBottom: "4px" }}>{title}</p>
+          <p style={{ color: "#7e7e7e", fontSize: "12px", fontWeight: 300 }}>{desc}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ── Main ─────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
-    totalSources: 0,
-    safeSources: 0,
-    cautionSources: 0,
-    unsafeSources: 0,
-    pendingReports: 0,
-    totalReports: 0,
-    totalQualityChecks: 0,
-    recentAlerts: 0,
+    totalSources: 0, safeSources: 0, cautionSources: 0, unsafeSources: 0,
+    pendingReports: 0, totalReports: 0, totalQualityChecks: 0,
   });
-  const [loading, setLoading] = useState(true);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchData = async () => {
     try {
-      const [sourcesRes, reportsRes, qualityRes] = await Promise.all([
+      const [sRes, rRes, qRes] = await Promise.all([
         getAllWaterSources(),
         getAllDamageReports(),
         getAllQualityReports(),
       ]);
-
-      const sources = sourcesRes.data.results || sourcesRes.data;
-      const reports = reportsRes.data.results || reportsRes.data;
-      const quality = qualityRes.data.results || qualityRes.data;
+      const sources = sRes.data.results || sRes.data;
+      const reports = rRes.data.results || rRes.data;
+      const quality = qRes.data.results || qRes.data;
 
       setStats({
-        totalSources: sources.length,
-        safeSources: sources.filter((s) => s.status === "safe").length,
-        cautionSources: sources.filter((s) => s.status === "caution").length,
-        unsafeSources: sources.filter((s) => s.status === "unsafe").length,
-        pendingReports: reports.filter((r) => r.status === "pending").length,
-        totalReports: reports.length,
+        totalSources:      sources.length,
+        safeSources:       sources.filter((s) => s.status === "safe").length,
+        cautionSources:    sources.filter((s) => s.status === "caution").length,
+        unsafeSources:     sources.filter((s) => s.status === "unsafe").length,
+        pendingReports:    reports.filter((r) => r.status === "pending").length,
+        totalReports:      reports.length,
         totalQualityChecks: quality.length,
-        recentAlerts: sources.filter((s) => s.status === "unsafe").length,
       });
 
-      // Recent activity
       const activity = [
-        ...reports.slice(0, 3).map((r) => ({
-          id: r.id,
-          type: "report",
-          message: `Ripoti mpya: ${r.title}`,
+        ...reports.slice(0, 4).map((r) => ({
+          id: `r${r.id}`, type: "report",
+          message: r.title,
+          sub: r.water_source?.name || "—",
           time: r.report_date,
           status: r.status,
         })),
         ...quality.slice(0, 3).map((q) => ({
-          id: q.id,
-          type: "quality",
-          message: `Upimaji: ${q.water_source?.name}`,
+          id: `q${q.id}`, type: "quality",
+          message: `Upimaji: ${q.water_source?.name || "—"}`,
+          sub: q.is_safe ? "Salama" : "Sio salama",
           time: q.test_date,
           status: q.is_safe ? "safe" : "unsafe",
         })),
       ]
         .sort((a, b) => new Date(b.time) - new Date(a.time))
-        .slice(0, 5);
+        .slice(0, 6);
 
       setRecentActivity(activity);
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const StatCard = ({ title, value, subtitle, colorClass, icon, trend, delay }) => (
-    <div className={`relative overflow-hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 animate-fade-in-up ${delay}`}>
-      <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-10 ${colorClass}`}></div>
-      <div className="flex items-start justify-between relative z-10">
-        <div>
-          <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{title}</p>
-          <p className="text-4xl font-extrabold text-gray-900 mt-2">{value}</p>
-          {subtitle && <p className="text-sm text-gray-500 mt-2">{subtitle}</p>}
-          {trend && (
-            <p className={`text-sm mt-2 font-medium flex items-center ${trend > 0 ? "text-green-600" : "text-red-600"}`}>
-              {trend > 0 ? (
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-              ) : (
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-              )}
-              {Math.abs(trend)}% mwezi huu
-            </p>
-          )}
-        </div>
-        <div className={`p-4 rounded-xl ${colorClass.replace('bg-', 'bg-opacity-10 text-')}`}>
-          <span className="text-3xl">{icon}</span>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="relative w-16 h-16">
-            <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-200 rounded-full"></div>
-            <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-          </div>
-        </div>
-      </AdminLayout>
-    );
-  }
-
   return (
     <AdminLayout>
-      <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl font-bold text-gray-900">Dashibodi ya Usimamizi</h1>
-        <p className="text-gray-500 mt-1">Uhakiki kamili wa mfumo na takwimu.</p>
+      {/* ─── PAGE HEADER ─── */}
+      <div style={{ marginBottom: "40px" }} className="animate-fade-in-up">
+        <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>
+          Msimamizi · Muhtasari wa Mfumo
+        </p>
+        <h1 style={{ color: "#ffffff", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700, textTransform: "uppercase", lineHeight: 1.05 }}>
+          Dashboard
+        </h1>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          title="Jumla ya Vyanzo"
-          value={stats.totalSources}
-          subtitle="Vyanzo vyote vya maji"
-          colorClass="bg-blue-500"
-          icon="💧"
-          trend={5}
-          delay="delay-100"
-        />
-        <StatCard
-          title="Vyanzo Salama"
-          value={stats.safeSources}
-          subtitle={`${Math.round((stats.safeSources / (stats.totalSources || 1)) * 100)}% ya jumla`}
-          colorClass="bg-green-500"
-          icon="✅"
-          trend={3}
-          delay="delay-200"
-        />
-        <StatCard
-          title="Vyanzo Hatarini"
-          value={stats.unsafeSources}
-          subtitle="Vinahitaji hatua haraka"
-          colorClass="bg-red-500"
-          icon="⚠️"
-          trend={-2}
-          delay="delay-300"
-        />
-        <StatCard
-          title="Ripoti Zinazosubiri"
-          value={stats.pendingReports}
-          subtitle="Zinahitaji uchunguzi"
-          colorClass="bg-yellow-500"
-          icon="📋"
-          trend={8}
-          delay="delay-400"
-        />
-      </div>
+      {/* ─── PRIMARY STATS ─── */}
+      <section style={{ marginBottom: "40px" }}>
+        <p style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "16px" }}>
+          Vyanzo vya Maji
+        </p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "#3c3c3c" }}>
+          <StatCard title="Jumla ya Vyanzo"  value={stats.totalSources}   accent="#0066b1" loading={loading} />
+          <StatCard title="Vyanzo Salama"    value={stats.safeSources}    accent="#0fa336" loading={loading} sub={`${stats.totalSources > 0 ? Math.round((stats.safeSources / stats.totalSources) * 100) : 0}% ya jumla`} />
+          <StatCard title="Tahadhari"        value={stats.cautionSources} accent="#f4b400" loading={loading} />
+          <StatCard title="Hatarini"         value={stats.unsafeSources}  accent="#e22718" loading={loading} />
+        </div>
+      </section>
 
-      {/* Charts & Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Status Distribution */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 animate-fade-in-up delay-100 hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
-            <span className="w-2 h-6 bg-blue-500 rounded-full mr-3"></span>
-            Mgawanyo wa Hali
-          </h3>
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-semibold text-gray-700">Salama</span>
-                <span className="font-bold text-gray-900">{stats.safeSources}</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div
-                  className="bg-green-500 h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${(stats.safeSources / (stats.totalSources || 1)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-semibold text-gray-700">Tahadhari</span>
-                <span className="font-bold text-gray-900">{stats.cautionSources}</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div
-                  className="bg-yellow-400 h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${(stats.cautionSources / (stats.totalSources || 1)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-semibold text-gray-700">Hatarini</span>
-                <span className="font-bold text-gray-900">{stats.unsafeSources}</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div
-                  className="bg-red-500 h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${(stats.unsafeSources / (stats.totalSources || 1)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
+      <section style={{ marginBottom: "40px" }}>
+        <p style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "16px" }}>
+          Ripoti &amp; Ubora
+        </p>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "#3c3c3c" }}>
+          <StatCard title="Ripoti Zote"       value={stats.totalReports}       accent="#1c69d4" loading={loading} />
+          <StatCard title="Zinasubiri"        value={stats.pendingReports}     accent="#f4b400" loading={loading} />
+          <StatCard title="Upimaji wa Ubora"  value={stats.totalQualityChecks} accent="#0066b1" loading={loading} />
+        </div>
+      </section>
+
+      {/* ─── MAIN GRID: ACTIVITY + QUICK LINKS ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-px" style={{ background: "#3c3c3c" }}>
+
+        {/* Recent Activity (2/3 width) */}
+        <div style={{ background: "#000000", gridColumn: "span 2" }} className="lg:col-span-2">
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid #3c3c3c" }}>
+            <p style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+              Shughuli za Hivi Karibuni
+            </p>
+          </div>
+
+          {/* Table */}
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid #1a1a1a" }}>
+                  {["Tukio", "Chanzo / Maelezo", "Hali", "Wakati"].map((h) => (
+                    <th key={h} style={{
+                      padding: "10px 16px", textAlign: "left",
+                      color: "#7e7e7e", fontSize: "10px", fontWeight: 700,
+                      letterSpacing: "1.5px", textTransform: "uppercase", whiteSpace: "nowrap",
+                    }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  [1,2,3,4].map((i) => (
+                    <tr key={i} style={{ borderBottom: "1px solid #1a1a1a" }}>
+                      {[1,2,3,4].map((j) => (
+                        <td key={j} style={{ padding: "14px 16px" }}>
+                          <div style={{ height: "10px", background: "#1a1a1a", width: "70%" }} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : recentActivity.length > 0 ? (
+                  recentActivity.map((item) => (
+                    <tr
+                      key={item.id}
+                      style={{ borderBottom: "1px solid #0d0d0d", transition: "background 0.12s" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "#0d0d0d")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    >
+                      <td style={{ padding: "13px 16px" }}>
+                        <div
+                          style={{
+                            display: "inline-block",
+                            padding: "2px 8px",
+                            background: item.type === "report" ? "#001a2e" : "#001a3e",
+                            color: item.type === "report" ? "#0066b1" : "#1c69d4",
+                            fontSize: "9px",
+                            fontWeight: 700,
+                            letterSpacing: "1px",
+                            textTransform: "uppercase",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          {item.type === "report" ? "Ripoti" : "Ubora"}
+                        </div>
+                        <p style={{ color: "#e6e6e6", fontSize: "13px", fontWeight: 400 }}>{item.message}</p>
+                      </td>
+                      <td style={{ padding: "13px 16px", color: "#7e7e7e", fontSize: "12px", fontWeight: 300 }}>
+                        {item.sub}
+                      </td>
+                      <td style={{ padding: "13px 16px" }}>
+                        <StatusBadge status={item.status} />
+                      </td>
+                      <td style={{ padding: "13px 16px", color: "#7e7e7e", fontSize: "11px", fontWeight: 300, whiteSpace: "nowrap" }}>
+                        {item.time ? new Date(item.time).toLocaleDateString("sw-TZ") : "—"}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ padding: "40px 16px", textAlign: "center", color: "#7e7e7e", fontSize: "14px", fontWeight: 300 }}>
+                      Hakuna shughuli mpya.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 animate-fade-in-up delay-200 hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
-            <span className="w-2 h-6 bg-purple-500 rounded-full mr-3"></span>
-            Vitendo vya Haraka
-          </h3>
-          <div className="space-y-4">
-            <Link
-              to="/admin/water-sources"
-              className="group flex items-center p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:bg-blue-50 transition-all duration-200"
-            >
-              <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">➕</div>
-              <div className="ml-4">
-                <p className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">Ongeza Chanzo Kipya</p>
-                <p className="text-sm text-gray-500">Sajili chanzo kipya cha maji</p>
-              </div>
-            </Link>
-            <Link
-              to="/admin/quality"
-              className="group flex items-center p-4 rounded-xl border border-gray-100 hover:border-green-100 hover:bg-green-50 transition-all duration-200"
-            >
-              <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🔬</div>
-              <div className="ml-4">
-                <p className="font-bold text-gray-900 group-hover:text-green-700 transition-colors">Weka Upimaji Mpya</p>
-                <p className="text-sm text-gray-500">Rekodi matokeo ya ubora</p>
-              </div>
-            </Link>
-            <Link
-              to="/admin/reports"
-              className="group flex items-center p-4 rounded-xl border border-gray-100 hover:border-yellow-100 hover:bg-yellow-50 transition-all duration-200"
-            >
-              <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">📋</div>
-              <div className="ml-4">
-                <p className="font-bold text-gray-900 group-hover:text-yellow-700 transition-colors">Angalia Ripoti</p>
-                <p className="text-sm text-gray-500">{stats.pendingReports} zinazosubiri</p>
-              </div>
-            </Link>
+        {/* Quick Links (1/3 width) */}
+        <div style={{ background: "#000000" }} className="lg:col-span-1">
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid #3c3c3c" }}>
+            <p style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+              Viungo vya Haraka
+            </p>
           </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 animate-fade-in-up delay-300 hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
-            <span className="w-2 h-6 bg-teal-500 rounded-full mr-3"></span>
-            Shughuli za Hivi Karibuni
-          </h3>
-          <div className="space-y-6">
-            {recentActivity.length > 0 ? (
-              recentActivity.map((activity, idx) => (
-                <div key={activity.id + '-' + idx} className="relative pl-6 pb-2 border-l-2 border-gray-100 last:border-0 last:pb-0">
-                  <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white ${
-                    activity.type === "report" ? "bg-yellow-400" : "bg-blue-400"
-                  }`}></div>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-bold text-gray-900">{activity.message}</p>
-                      <p className="text-xs text-gray-500 mt-1 font-medium">{new Date(activity.time).toLocaleString("sw-TZ")}</p>
-                    </div>
-                    <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${
-                      activity.status === "safe" || activity.status === "resolved"
-                        ? "bg-green-100 text-green-700"
-                        : activity.status === "pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-red-100 text-red-700"
-                    }`}>
-                      {activity.status}
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-center py-4">Hakuna shughuli hivi karibuni.</p>
-            )}
+          <div className="divide-y" style={{ borderColor: "#1a1a1a" }}>
+            {[
+              { to: "/admin/water-sources", abbr: "VS", title: "Vyanzo vya Maji",    desc: "Simamia vyanzo vyote",           accent: "#0066b1" },
+              { to: "/admin/reports",       abbr: "RP", title: "Ripoti za Uharibifu", desc: "Angalia na gawa kazi",           accent: "#e22718" },
+              { to: "/admin/quality",       abbr: "QR", title: "Ripoti za Ubora",    desc: "Rekodi upimaji wa maji",         accent: "#0fa336" },
+              { to: "/admin/users",         abbr: "WA", title: "Watumiaji",           desc: "Simamia akaunti za watumiaji",   accent: "#1c69d4" },
+              { to: "/admin/alerts",        abbr: "AR", title: "Arifa",               desc: "Tuma arifa kwa wananchi",        accent: "#f4b400" },
+              { to: "/admin/villages",      abbr: "VJ", title: "Vijiji",              desc: "Simamia vijiji na maeneo",       accent: "#7e7e7e" },
+            ].map((card) => (
+              <div key={card.to} style={{ borderBottom: "1px solid #1a1a1a" }}>
+                <QuickCard {...card} />
+              </div>
+            ))}
           </div>
         </div>
       </div>
