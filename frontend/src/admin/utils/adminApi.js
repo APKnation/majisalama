@@ -26,6 +26,8 @@ export const createQualityReport = (data) =>
 // Alerts
 export const getAllAlerts = () => api.get("/alerts/");
 export const createAlert = (data) => api.post("/alerts/", data);
+export const updateAlert = (id, data) => api.patch(`/alerts/${id}/`, data);
+export const deleteAlert = (id) => api.delete(`/alerts/${id}/`);
 
 // Users
 export const getAllUsers = () => api.get("/users/");

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout";
-import { getAllAlerts, getAllWaterSources, createAlert } from "../utils/adminApi";
+import { getAllAlerts, getAllWaterSources, createAlert, updateAlert, deleteAlert } from "../utils/adminApi";
 
 const ALERT_TYPES = [
   { value: "quality_drop", label: "Ubora Umeshuka" },
@@ -15,6 +15,7 @@ export default function AlertsAdmin() {
   const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState(null);
   const [formData, setFormData] = useState({
     alert_type: "general",
     message: "",
@@ -46,20 +47,55 @@ export default function AlertsAdmin() {
     }
   };
 
+  const handleOpenModal = (alert = null) => {
+    if (alert) {
+      setSelectedAlert(alert);
+      setFormData({
+        alert_type: alert.alert_type,
+        message: alert.message,
+        water_source_id: alert.water_source ? alert.water_source.id : "",
+      });
+    } else {
+      setSelectedAlert(null);
+      setFormData({ alert_type: "general", message: "", water_source_id: "" });
+    }
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createAlert({
+      const payload = {
         alert_type: formData.alert_type,
         message: formData.message,
         water_source_id: formData.water_source_id || null,
-      });
+      };
+
+      if (selectedAlert) {
+        await updateAlert(selectedAlert.id, payload);
+      } else {
+        await createAlert(payload);
+      }
+      
       setShowModal(false);
       setFormData({ alert_type: "general", message: "", water_source_id: "" });
+      setSelectedAlert(null);
       fetchAlerts();
     } catch (error) {
       console.error("Error saving alert:", error);
       alert("Kuna hitilafu. Jaribu tena.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Je, una uhakika unataka kufuta arifa hii?")) {
+      try {
+        await deleteAlert(id);
+        fetchAlerts();
+      } catch (error) {
+        console.error("Error deleting alert:", error);
+        alert("Kuna hitilafu wakati wa kufuta.");
+      }
     }
   };
 
@@ -68,7 +104,7 @@ export default function AlertsAdmin() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Arifa</h2>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => handleOpenModal()}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
         >
           <span>➕</span> Tengeneza Arifa
@@ -83,15 +119,32 @@ export default function AlertsAdmin() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ujumbe</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chanzo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tarehe</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vitendo</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {alerts.map((alert) => (
               <tr key={alert.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium text-gray-900">{alert.alert_type}</td>
+                <td className="px-6 py-4 font-medium text-gray-900">
+                  {ALERT_TYPES.find(t => t.value === alert.alert_type)?.label || alert.alert_type}
+                </td>
                 <td className="px-6 py-4 text-gray-600">{alert.message}</td>
                 <td className="px-6 py-4 text-gray-600">{alert.water_source?.name || "-"}</td>
                 <td className="px-6 py-4 text-gray-600">{new Date(alert.created_at).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-sm font-medium">
+                  <button
+                    onClick={() => handleOpenModal(alert)}
+                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                  >
+                    Badili
+                  </button>
+                  <button
+                    onClick={() => handleDelete(alert.id)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    Futa
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -101,7 +154,7 @@ export default function AlertsAdmin() {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4">Tengeneza Arifa</h3>
+            <h3 className="text-xl font-bold mb-4">{selectedAlert ? "Badili Arifa" : "Tengeneza Arifa"}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Aina ya arifa</label>
@@ -142,7 +195,7 @@ export default function AlertsAdmin() {
               </div>
               <div className="flex gap-3 pt-4">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Ghairi</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Tuma</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">{selectedAlert ? "Hifadhi" : "Tuma"}</button>
               </div>
             </form>
           </div>
