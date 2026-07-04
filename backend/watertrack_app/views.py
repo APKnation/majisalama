@@ -239,7 +239,9 @@ class AlertViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if not user.is_authenticated:
             return Alert.objects.none()
-        return Alert.objects.filter(recipients=user).distinct()
+        if user.is_superuser or user.role == 'admin':
+            return Alert.objects.all().order_by('-created_at')
+        return Alert.objects.filter(recipients=user).distinct().order_by('-created_at')
 
     def perform_create(self, serializer):
         alert = serializer.save()

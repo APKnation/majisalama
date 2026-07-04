@@ -6,9 +6,12 @@ django.setup()
 
 from rest_framework.test import APIClient
 from watertrack_app.models import User
+from django.conf import settings
 
-admin = User.objects.get(username='admin_test')
+settings.ALLOWED_HOSTS = ['*']
+
 client = APIClient()
+admin = User.objects.get(username='admin_test')
 client.force_authenticate(user=admin)
 
 response = client.get('/api/alerts/', format='json')
