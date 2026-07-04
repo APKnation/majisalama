@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from "react";
 import api from "../utils/api";
 
+function StatusBadge({ status, label }) {
+  const map = {
+    pending:     { color: "#f4b400", bg: "#2a2200" },
+    assigned:    { color: "#0066b1", bg: "#001a2e" },
+    in_progress: { color: "#1c69d4", bg: "#001a3e" },
+    resolved:    { color: "#0fa336", bg: "#012010" },
+    closed:      { color: "#7e7e7e", bg: "#1a1a1a" },
+  };
+  const s = map[status] || { color: "#7e7e7e", bg: "#1a1a1a" };
+  return (
+    <span style={{ display: "inline-block", padding: "2px 10px", background: s.bg, color: s.color, fontSize: "10px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", border: `1px solid ${s.color}33` }}>
+      {label || status}
+    </span>
+  );
+}
+
 export default function AssignTasks() {
   const [reports, setReports] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -51,54 +67,59 @@ export default function AssignTasks() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Tenga Kazi</h1>
-        <p className="text-gray-600 mt-2">Chagua ripoti na ipe mfanyakazi anayefaa.</p>
-      </div>
+    <div style={{ background: "#000000", minHeight: "100vh", color: "#ffffff" }}>
+      <div className="m-stripe" />
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 32px" }}>
+        <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>
+          Usimamizi
+        </p>
+        <h1 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700, textTransform: "uppercase", marginBottom: "8px" }}>
+          Tenga Kazi
+        </h1>
+        <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300, marginBottom: "32px" }}>
+          Chagua ripoti na ipe mfanyakazi anayefaa.
+        </p>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto mb-8">
-        <table className="w-full min-w-[900px]">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chanzo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ripoti</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kipaumbele</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hali</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Uchague</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {reports.map((report) => (
-              <tr key={report.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setSelectedReport(report)}>
-                <td className="px-6 py-4 font-medium text-gray-900">{report.water_source?.name}</td>
-                <td className="px-6 py-4 text-gray-600">{report.title}</td>
-                <td className="px-6 py-4 capitalize text-gray-600">{report.priority}</td>
-                <td className="px-6 py-4 capitalize text-gray-600">{report.status}</td>
-                <td className="px-6 py-4">
-                  {selectedReport?.id === report.id ? (
-                    <span className="text-blue-600 font-semibold">Imechaguliwa</span>
-                  ) : (
-                    <span className="text-gray-500">Gonga chagua</span>
-                  )}
-                </td>
+        <div style={{ border: "1px solid #3c3c3c", overflowX: "auto", marginBottom: "32px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid #3c3c3c", background: "#0d0d0d" }}>
+                {["Chanzo", "Ripoti", "Kipaumbele", "Hali", "Uchague"].map((h) => (
+                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                    {h}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {reports.map((report) => (
+                <tr key={report.id} onClick={() => setSelectedReport(report)} style={{ borderBottom: "1px solid #1a1a1a", cursor: "pointer", transition: "background 0.12s", background: selectedReport?.id === report.id ? "#1a1a1a" : "transparent" }}
+                  onMouseEnter={(e) => { if(selectedReport?.id !== report.id) e.currentTarget.style.background = "#0d0d0d" }}
+                  onMouseLeave={(e) => { if(selectedReport?.id !== report.id) e.currentTarget.style.background = "transparent" }}
+                >
+                  <td style={{ padding: "14px 16px", color: "#ffffff", fontSize: "14px", fontWeight: 700 }}>{report.water_source?.name}</td>
+                  <td style={{ padding: "14px 16px", color: "#bbbbbb", fontSize: "13px", fontWeight: 300 }}>{report.title}</td>
+                  <td style={{ padding: "14px 16px", color: "#bbbbbb", fontSize: "13px", fontWeight: 300, textTransform: "capitalize" }}>{report.priority}</td>
+                  <td style={{ padding: "14px 16px" }}><StatusBadge status={report.status} /></td>
+                  <td style={{ padding: "14px 16px", color: selectedReport?.id === report.id ? "#0066b1" : "#7e7e7e", fontSize: "12px", fontWeight: selectedReport?.id === report.id ? 700 : 300 }}>
+                    {selectedReport?.id === report.id ? "Imechaguliwa" : "Gonga chagua"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      {selectedReport ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-4">Ripoti: {selectedReport.title}</h2>
-          <p className="text-gray-600 mb-4">{selectedReport.description}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Chagua mfanyakazi</label>
+        {selectedReport ? (
+          <div style={{ background: "#0d0d0d", padding: "32px", border: "1px solid #3c3c3c" }} className="animate-fade-in-up">
+            <h2 style={{ color: "#ffffff", fontSize: "20px", fontWeight: 700, textTransform: "uppercase", marginBottom: "16px" }}>Ripoti: {selectedReport.title}</h2>
+            <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300, marginBottom: "24px" }}>{selectedReport.description}</p>
+            <div style={{ marginBottom: "24px" }}>
+              <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Chagua mfanyakazi</label>
               <select
                 value={assignWorkerId}
                 onChange={(e) => setAssignWorkerId(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                style={{ width: "100%", padding: "12px 16px", background: "#1a1a1a", border: "1px solid #3c3c3c", color: "#ffffff", fontSize: "14px", borderRadius: "0" }}
               >
                 <option value="">Chagua mfanyakazi</option>
                 {workers.map((worker) => (
@@ -108,26 +129,21 @@ export default function AssignTasks() {
                 ))}
               </select>
             </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <button onClick={() => setSelectedReport(null)} className="btn-m-outline" style={{ height: "40px", padding: "0 24px", fontSize: "12px" }}>
+                Ghairi
+              </button>
+              <button onClick={handleAssign} disabled={!assignWorkerId || loading} className="btn-m-primary" style={{ height: "40px", padding: "0 24px", fontSize: "12px", opacity: (!assignWorkerId || loading) ? 0.5 : 1 }}>
+                {loading ? "Inatuma..." : "Tuma Kazi"}
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-3 mt-6">
-            <button
-              onClick={() => setSelectedReport(null)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              Ghairi
-            </button>
-            <button
-              onClick={handleAssign}
-              disabled={!assignWorkerId || loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
-            >
-              {loading ? "Inatuma..." : "Tuma Kazi"}
-            </button>
+        ) : (
+          <div style={{ border: "1px solid #3c3c3c", padding: "48px", textAlign: "center", color: "#7e7e7e", fontWeight: 300 }}>
+            Chagua ripoti kutoka kwenye jedwali ili kuanza kugawa kazi.
           </div>
-        </div>
-      ) : (
-        <div className="text-gray-600">Chagua ripoti kutoka kwenye jedwali ili kuanza kugawa kazi.</div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
