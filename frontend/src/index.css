@@ -1,4 +1,4 @@
-/* src/index.css (v3) */
+/* src/index.css — BMW M Design System */
 
 @tailwind base;
 @tailwind components;
@@ -7,45 +7,251 @@
 /* Leaflet CSS */
 @import 'leaflet/dist/leaflet.css';
 
+/* ─── BMW M Design Tokens ──────────────────────────────────────────── */
+:root {
+  --canvas:           #000000;
+  --surface-card:     #1a1a1a;
+  --surface-elevated: #262626;
+  --surface-soft:     #0d0d0d;
+  --hairline:         #3c3c3c;
+  --hairline-strong:  #262626;
+  --ink:              #ffffff;
+  --body:             #bbbbbb;
+  --body-strong:      #e6e6e6;
+  --muted:            #7e7e7e;
+  --m-blue-light:     #0066b1;
+  --m-blue-dark:      #1c69d4;
+  --m-red:            #e22718;
+  --carbon-gray:      #2b2b2b;
+  --warning:          #f4b400;
+  --success:          #0fa336;
+}
+
+/* ─── Base Reset ─────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  @apply bg-gray-50 text-gray-900;
-  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--canvas);
+  color: var(--ink);
+  font-family: 'BMW Typeface', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
+/* ─── M Tricolor Stripe ──────────────────────────────────────────── */
+.m-stripe {
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    var(--m-blue-light) 0%,
+    var(--m-blue-light) 33.33%,
+    var(--m-blue-dark)  33.33%,
+    var(--m-blue-dark)  66.66%,
+    var(--m-red)        66.66%,
+    var(--m-red)        100%
+  );
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* ─── Typography ─────────────────────────────────────────────────── */
+.display-xl {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.display-lg {
+  font-size: clamp(36px, 4.5vw, 56px);
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.display-md {
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.display-sm {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.label-uppercase {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.body-md {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.body-sm {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* ─── BMW M Buttons ──────────────────────────────────────────────── */
+.btn-m-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  height: 48px;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-m-primary:hover {
+  background-color: #e6e6e6;
+}
+
+.btn-m-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  height: 48px;
+  border: 1px solid #ffffff;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-m-outline:hover {
+  background-color: rgba(255,255,255,0.08);
+}
+
+/* ─── BMW M Card ─────────────────────────────────────────────────── */
+.m-card {
+  background-color: var(--surface-card);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+/* ─── BMW M Input ────────────────────────────────────────────────── */
+.m-input {
+  width: 100%;
+  background-color: var(--surface-card);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 300;
+  padding: 12px 16px;
+  height: 48px;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.m-input:focus {
+  border-color: #ffffff;
+}
+
+.m-input::placeholder {
+  color: var(--muted);
+}
+
+.m-textarea {
+  width: 100%;
+  background-color: var(--surface-card);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 300;
+  padding: 12px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.15s ease;
+  resize: vertical;
+}
+
+.m-textarea:focus {
+  border-color: #ffffff;
+}
+
+.m-select {
+  width: 100%;
+  background-color: var(--surface-card);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 300;
+  padding: 12px 16px;
+  height: 48px;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.m-select:focus {
+  border-color: #ffffff;
+}
+
+.m-select option {
+  background-color: var(--surface-card);
+}
+
+/* ─── Leaflet ────────────────────────────────────────────────────── */
 .leaflet-container {
-  @apply h-full w-full;
+  height: 100%;
+  width: 100%;
 }
 
-@layer utilities {
-  .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
-  }
-  .glass-dark {
-    @apply bg-gray-900/70 backdrop-blur-md border border-gray-700/50 shadow-2xl;
-  }
-}
-
+/* ─── Animations ─────────────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 
-.delay-100 {
-  animation-delay: 100ms;
-}
-.delay-200 {
-  animation-delay: 200ms;
-}
-.delay-300 {
-  animation-delay: 300ms;
-}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+/* ─── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--canvas); }
+::-webkit-scrollbar-thumb { background: var(--hairline); }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
