@@ -33,167 +33,214 @@ export default function Register() {
     }
   };
 
+  const Field = ({ label, children }) => (
+    <div>
+      <label
+        className="block mb-2"
+        style={{ color: "#7e7e7e", fontSize: "11px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase" }}
+      >
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen flex w-full bg-gray-50">
-      {/* Left side: Premium Abstract Gradient */}
-      <div className="hidden lg:flex flex-col justify-center items-start w-1/2 bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-900 text-white p-16 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-30">
-          <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-          <div className="absolute top-[20%] left-[-10%] w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-[-20%] right-[20%] w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
-        </div>
-        
-        <div className="relative z-10 animate-fade-in-up">
-          <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-8 border border-white/20">
-            <span className="text-4xl">🌊</span>
-          </div>
-          <h1 className="text-5xl font-extrabold tracking-tight mb-4">
-            Anza Safari Yako
-          </h1>
-          <p className="text-xl text-blue-100 max-w-md font-light leading-relaxed">
-            Jiunge na mtandao wetu na uwe sehemu ya mabadiliko chanya katika utunzaji wa vyanzo vya maji.
-          </p>
-        </div>
-      </div>
+    <div style={{ background: "#000000", minHeight: "100vh" }} className="flex flex-col">
+      {/* ─── M TRICOLOR STRIPE ─── */}
+      <div className="m-stripe" />
 
-      {/* Right side: Register Form */}
-      <div className="flex flex-col justify-center items-center w-full lg:w-1/2 p-8 sm:p-12 lg:p-24 relative bg-gradient-to-b from-gray-50 to-gray-100 overflow-y-auto">
-        <div className="w-full max-w-lg animate-fade-in-up delay-100 py-10">
-          <div className="text-center lg:text-left mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-              Unda Akaunti Mpya
+      <div className="flex flex-1">
+        {/* ─── LEFT PANEL ─── */}
+        <div
+          className="hidden lg:flex flex-col justify-between w-1/2 p-16 relative overflow-hidden"
+          style={{ background: "#0d0d0d", borderRight: "1px solid #3c3c3c" }}
+        >
+          <div
+            style={{
+              position: "absolute", inset: 0,
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+              pointerEvents: "none",
+            }}
+          />
+
+          <div className="relative z-10">
+            <div className="m-stripe" style={{ width: "40px", height: "3px", marginBottom: "24px" }} />
+            <span className="font-bold text-white tracking-[2px] uppercase text-sm">
+              Maji Salama
+            </span>
+          </div>
+
+          <div className="relative z-10">
+            <p className="label-uppercase mb-6" style={{ color: "#0066b1" }}>
+              Karibu Kwenye Familia
+            </p>
+            <h1 className="display-lg text-white mb-6">
+              Anza Safari<br />Yako Leo.
+            </h1>
+            <p className="body-md" style={{ color: "#bbbbbb", maxWidth: "400px" }}>
+              Jiunge na mtandao wetu na uwe sehemu ya mabadiliko chanya
+              katika utunzaji wa vyanzo vya maji Tanzania.
+            </p>
+          </div>
+
+          {/* perks */}
+          <div className="relative z-10 space-y-3">
+            {[
+              "Ripoti uharibifu wa vyanzo vya maji",
+              "Fuatilia hali ya vyanzo kwa wakati halisi",
+              "Pata arifa za matengenezo na ubora",
+            ].map((perk) => (
+              <div key={perk} className="flex items-start gap-3">
+                <div
+                  style={{ width: "6px", height: "6px", background: "#0066b1", flexShrink: 0, marginTop: "7px" }}
+                />
+                <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300 }}>{perk}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── RIGHT PANEL: FORM ─── */}
+        <div
+          className="flex flex-col justify-center items-center w-full lg:w-1/2 p-8 sm:p-12 lg:p-16 overflow-y-auto"
+          style={{ background: "#000000" }}
+        >
+          <div className="w-full max-w-md animate-fade-in-up py-8">
+            {/* mobile brand */}
+            <div className="lg:hidden mb-8 flex items-center gap-3">
+              <div className="m-stripe" style={{ width: "28px", height: "3px" }} />
+              <span className="font-bold text-white tracking-[2px] uppercase text-sm">
+                Maji Salama
+              </span>
+            </div>
+
+            <p className="label-uppercase mb-2" style={{ color: "#0066b1" }}>
+              Akaunti Mpya
+            </p>
+            <h2 className="text-3xl font-bold text-white mb-8 uppercase tracking-wide">
+              Jisajili
             </h2>
-            <p className="text-gray-500 mt-2 font-medium">
-              Jaza taarifa zako hapa chini kujiunga.
-            </p>
-          </div>
 
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg mb-6 animate-fade-in-up flex items-center shadow-sm">
-              <span className="text-xl mr-3">⚠️</span>
-              <p className="text-sm font-medium">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="group">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-blue-600">
-                  Jina la Kwanza
-                </label>
-                <input
-                  type="text"
-                  value={formData.first_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, first_name: e.target.value })
-                  }
-                  className="w-full pl-4 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-300 shadow-sm"
-                  required
-                />
-              </div>
-              <div className="group">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-blue-600">
-                  Jina la Mwisho
-                </label>
-                <input
-                  type="text"
-                  value={formData.last_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, last_name: e.target.value })
-                  }
-                  className="w-full pl-4 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-300 shadow-sm"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="group">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-blue-600">
-                Jina la Mtumiaji
-              </label>
-              <input
-                type="text"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-                className="w-full pl-4 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-300 shadow-sm"
-                required
-              />
-            </div>
-
-            <div className="group">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-blue-600">
-                Barua Pepe
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className="w-full pl-4 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-300 shadow-sm"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="group">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-blue-600">
-                  Nywila
-                </label>
-                <input
-                  type="password"
-                  value={formData.password1}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password1: e.target.value })
-                  }
-                  className="w-full pl-4 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-300 shadow-sm"
-                  required
-                />
-              </div>
-              <div className="group">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-blue-600">
-                  Thibitisha Nywila
-                </label>
-                <input
-                  type="password"
-                  value={formData.password2}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password2: e.target.value })
-                  }
-                  className="w-full pl-4 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-300 shadow-sm"
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full relative flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-[15px] shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 transform hover:-translate-y-0.5 transition-all duration-200 active:translate-y-0 mt-6 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                "Kamilisha Usajili"
-              )}
-            </button>
-          </form>
-
-          <div className="mt-8 text-center">
-            <p className="text-gray-500 font-medium">
-              Tayari una akaunti?{" "}
-              <Link
-                to="/login"
-                className="text-blue-600 hover:text-blue-800 font-bold ml-1 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full"
+            {error && (
+              <div
+                style={{ background: "#1a1a1a", borderLeft: "2px solid #e22718" }}
+                className="flex items-center gap-3 px-4 py-3 mb-6"
               >
-                Ingia Hapa
-              </Link>
-            </p>
+                <span style={{ color: "#e22718" }}>⚠</span>
+                <p className="body-sm" style={{ color: "#bbbbbb" }}>{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Jina la Kwanza">
+                  <input
+                    type="text"
+                    value={formData.first_name}
+                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                    className="m-input"
+                    required
+                  />
+                </Field>
+                <Field label="Jina la Mwisho">
+                  <input
+                    type="text"
+                    value={formData.last_name}
+                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                    className="m-input"
+                    required
+                  />
+                </Field>
+              </div>
+
+              <Field label="Jina la Mtumiaji">
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="m-input"
+                  placeholder="username"
+                  required
+                />
+              </Field>
+
+              <Field label="Barua Pepe">
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="m-input"
+                  placeholder="email@example.com"
+                  required
+                />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Nywila">
+                  <input
+                    type="password"
+                    value={formData.password1}
+                    onChange={(e) => setFormData({ ...formData, password1: e.target.value })}
+                    className="m-input"
+                    placeholder="••••••••"
+                    required
+                  />
+                </Field>
+                <Field label="Thibitisha Nywila">
+                  <input
+                    type="password"
+                    value={formData.password2}
+                    onChange={(e) => setFormData({ ...formData, password2: e.target.value })}
+                    className="m-input"
+                    placeholder="••••••••"
+                    required
+                  />
+                </Field>
+              </div>
+
+              <div style={{ paddingTop: "8px" }}>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-m-primary w-full"
+                  style={{ opacity: isSubmitting ? 0.6 : 1 }}
+                >
+                  {isSubmitting ? (
+                    <div
+                      style={{
+                        width: "18px", height: "18px",
+                        border: "2px solid rgba(0,0,0,0.3)",
+                        borderTopColor: "#000",
+                        borderRadius: "50%",
+                        animation: "spin 0.7s linear infinite",
+                      }}
+                    />
+                  ) : "Kamilisha Usajili"}
+                </button>
+              </div>
+            </form>
+
+            <div
+              style={{ borderTop: "1px solid #3c3c3c", marginTop: "32px", paddingTop: "24px" }}
+              className="text-center"
+            >
+              <p style={{ color: "#7e7e7e", fontSize: "14px", fontWeight: 300 }}>
+                Tayari una akaunti?{" "}
+                <Link
+                  to="/login"
+                  style={{ color: "#ffffff", fontWeight: 700, letterSpacing: "0.5px", textDecoration: "none" }}
+                >
+                  Ingia Hapa →
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
