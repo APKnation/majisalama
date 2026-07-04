@@ -2,116 +2,99 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../utils/api";
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case "safe":
-      return "bg-green-100 text-green-800";
-    case "caution":
-      return "bg-yellow-100 text-yellow-800";
-    case "unsafe":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+function StatusBadge({ status, label }) {
+  const map = {
+    safe:         { color: "#0fa336", bg: "#012010" },
+    caution:      { color: "#f4b400", bg: "#2a2200" },
+    unsafe:       { color: "#e22718", bg: "#2e0800" },
+    under_repair: { color: "#1c69d4", bg: "#001a3e" },
+    dry:          { color: "#7e7e7e", bg: "#1a1a1a" },
+  };
+  const s = map[status] || { color: "#7e7e7e", bg: "#1a1a1a" };
+  return (
+    <span style={{ display: "inline-block", padding: "2px 10px", background: s.bg, color: s.color, fontSize: "10px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", border: `1px solid ${s.color}33` }}>
+      {label || status}
+    </span>
+  );
+}
 
 export default function WaterSourceDetail() {
   const { id } = useParams();
   const [source, setSource] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchSource();
-  }, [id]);
+  useEffect(() => { fetchSource(); }, [id]);
 
   const fetchSource = async () => {
     try {
       const response = await api.get(`/water-sources/${id}/`);
       setSource(response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error(error); } finally { setLoading(false); }
   };
 
-  if (loading) return <div className="p-8 text-center">Inapakia...</div>;
-  if (!source)
-    return <div className="p-8 text-center">Chanzo hakipatikani</div>;
+  if (loading) return <div style={{ background: "#000000", minHeight: "100vh", padding: "48px", color: "#7e7e7e", textAlign: "center" }}>Inapakia...</div>;
+  if (!source) return <div style={{ background: "#000000", minHeight: "100vh", padding: "48px", color: "#7e7e7e", textAlign: "center" }}>Chanzo hakipatikani</div>;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-4">
-        <Link to="/map" className="text-blue-600 hover:text-blue-800">
-          ← Rudi kwenye Ramani
-        </Link>
-      </div>
+    <div style={{ background: "#000000", minHeight: "100vh", color: "#ffffff" }}>
+      <div className="m-stripe" />
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 32px" }}>
+        <div style={{ marginBottom: "32px" }}>
+          <Link to="/map" style={{ color: "#0066b1", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none" }}>
+            ← Rudi kwenye Ramani
+          </Link>
+        </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {source.image && (
-          <img
-            src={source.image}
-            alt={source.name}
-            className="w-full h-64 object-cover"
-          />
-        )}
+        <div style={{ background: "#0d0d0d", border: "1px solid #3c3c3c", display: "flex", flexDirection: "column", md: { flexDirection: "row" } }} className="animate-fade-in-up">
+          {source.image && (
+            <div style={{ borderBottom: "1px solid #3c3c3c", md: { borderRight: "1px solid #3c3c3c", borderBottom: "none" }, flexShrink: 0 }}>
+              <img src={source.image} alt={source.name} style={{ width: "100%", md: { width: "400px" }, height: "100%", objectFit: "cover" }} />
+            </div>
+          )}
 
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">{source.name}</h1>
-            <span
-              className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(source.status)}`}
-            >
-              {source.status_display}
-            </span>
-          </div>
+          <div style={{ padding: "48px", flex: 1 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
+              <div>
+                <p style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maelezo ya Chanzo</p>
+                <h1 style={{ color: "#ffffff", fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 700, textTransform: "uppercase", lineHeight: 1.1 }}>{source.name}</h1>
+              </div>
+              <StatusBadge status={source.status} label={source.status_display} />
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Aina</h3>
-              <p className="text-gray-900">{source.source_type_display}</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px", marginBottom: "48px" }}>
+              <div>
+                <h3 style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "4px" }}>Aina</h3>
+                <p style={{ color: "#ffffff", fontSize: "15px", fontWeight: 300 }}>{source.source_type_display}</p>
+              </div>
+              <div>
+                <h3 style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "4px" }}>Kijiji</h3>
+                <p style={{ color: "#ffffff", fontSize: "15px", fontWeight: 300 }}>{source.village?.name}</p>
+              </div>
+              <div>
+                <h3 style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "4px" }}>pH</h3>
+                <p style={{ color: "#ffffff", fontSize: "15px", fontWeight: 300 }}>{source.ph_level || "Haijapimwa"}</p>
+              </div>
+              <div>
+                <h3 style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "4px" }}>Vimelea</h3>
+                <p style={{ color: "#ffffff", fontSize: "15px", fontWeight: 300 }}>{source.bacteria_count ? `${source.bacteria_count} CFU/100ml` : "Haijapimwa"}</p>
+              </div>
+              <div>
+                <h3 style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "4px" }}>Usafishaji Mwisho</h3>
+                <p style={{ color: "#ffffff", fontSize: "15px", fontWeight: 300 }}>{source.last_cleaned ? new Date(source.last_cleaned).toLocaleDateString("sw-TZ") : "Haijarekodiwa"}</p>
+              </div>
+              <div>
+                <h3 style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "4px" }}>Upimaji Mwisho</h3>
+                <p style={{ color: "#ffffff", fontSize: "15px", fontWeight: 300 }}>{source.last_tested ? new Date(source.last_tested).toLocaleDateString("sw-TZ") : "Haijapimwa"}</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Kijiji</h3>
-              <p className="text-gray-900">{source.village?.name}</p>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">pH</h3>
-              <p className="text-gray-900">{source.ph_level || "Haijapimwa"}</p>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">
-                Vimelea
-              </h3>
-              <p className="text-gray-900">
-                {source.bacteria_count || "Haijapimwa"} CFU/100ml
-              </p>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">
-                Usafishaji Mwisho
-              </h3>
-              <p className="text-gray-900">
-                {source.last_cleaned || "Haijarekodiwa"}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">
-                Upimaji Mwisho
-              </h3>
-              <p className="text-gray-900">
-                {source.last_tested || "Haijapimwa"}
-              </p>
-            </div>
-          </div>
 
-          <div className="mt-8 flex gap-4">
-            <Link
-              to="/report"
-              className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
-            >
-              Ripoti Uharibifu
-            </Link>
+            <div style={{ display: "flex", gap: "16px", borderTop: "1px solid #1a1a1a", paddingTop: "32px" }}>
+              <Link to="/report" style={{ display: "inline-block", background: "transparent", color: "#e22718", border: "1px solid #e22718", padding: "12px 24px", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", textDecoration: "none", transition: "background 0.2s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "#2e0800" }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+              >
+                Ripoti Uharibifu
+              </Link>
+            </div>
           </div>
         </div>
       </div>
