@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import MapView from "./pages/MapView";
 import WaterSourceDetail from "./pages/WaterSourceDetail";
@@ -131,6 +132,7 @@ function App() {
                 <>
                   <Navbar />
                   <Home />
+                  <Footer />
                 </>
               </PublicRoute>
             }
@@ -142,6 +144,7 @@ function App() {
                 <>
                   <Navbar />
                   <MapView />
+                  <Footer />
                 </>
               </PublicRoute>
             }
@@ -153,6 +156,7 @@ function App() {
                 <>
                   <Navbar />
                   <WaterSourceDetail />
+                  <Footer />
                 </>
               </PublicRoute>
             }
@@ -164,6 +168,7 @@ function App() {
                 <>
                   <Navbar />
                   <ReportDamage />
+                  <Footer />
                 </>
               </PublicRoute>
             }
@@ -175,6 +180,7 @@ function App() {
                 <>
                   <Navbar />
                   <Dashboard />
+                  <Footer />
                 </>
               </PublicRoute>
             }
@@ -186,6 +192,7 @@ function App() {
                 <>
                   <Navbar />
                   <Alerts />
+                  <Footer />
                 </>
               </PublicRoute>
             }
@@ -350,6 +357,7 @@ function App() {
               <>
                 <Navbar />
                 <Login />
+                <Footer />
               </>
             }
           />
@@ -359,6 +367,7 @@ function App() {
               <>
                 <Navbar />
                 <Register />
+                <Footer />
               </>
             }
           />
