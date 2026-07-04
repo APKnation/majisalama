@@ -64,7 +64,7 @@ export default function CreateReport() {
         <form onSubmit={handleSubmit} style={{ background: "#0d0d0d", border: "1px solid #3c3c3c", padding: "48px" }} className="animate-fade-in-up flex flex-col gap-6">
           <div>
             <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Chanzo cha maji</label>
-            <select name="water_source_id" value={formData.water_source_id} onChange={handleChange} required className="bmw-input">
+            <select name="water_source_id" value={formData.water_source_id} onChange={handleChange} required className="m-select">
               <option value="">Chagua chanzo</option>
               {waterSources.map((source) => (
                 <option key={source.id} value={source.id}>
@@ -76,17 +76,17 @@ export default function CreateReport() {
 
           <div>
             <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Kichwa cha ripoti</label>
-            <input name="title" value={formData.title} onChange={handleChange} required placeholder="Mfano: bomba limevunjika" className="bmw-input" />
+            <input name="title" value={formData.title} onChange={handleChange} required placeholder="Mfano: bomba limevunjika" className="m-input" />
           </div>
 
           <div>
             <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maelezo</label>
-            <textarea name="description" value={formData.description} onChange={handleChange} required rows={5} placeholder="Eleza tatizo kwa undani..." className="bmw-input" />
+            <textarea name="description" value={formData.description} onChange={handleChange} required rows={5} placeholder="Eleza tatizo kwa undani..." className="m-textarea" />
           </div>
 
           <div>
             <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Kipaumbele</label>
-            <select name="priority" value={formData.priority} onChange={handleChange} className="bmw-input">
+            <select name="priority" value={formData.priority} onChange={handleChange} className="m-select">
               <option value="low">Ndogo</option>
               <option value="medium">Wastani</option>
               <option value="high">Kubwa</option>

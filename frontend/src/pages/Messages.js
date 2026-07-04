@@ -140,18 +140,18 @@ export default function Messages() {
               <form onSubmit={sendMessage} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Mpokeaji</label>
-                  <select name="recipient_id" value={formData.recipient_id} onChange={handleChange} required className="bmw-input">
+                  <select name="recipient_id" value={formData.recipient_id} onChange={handleChange} required className="m-select">
                     <option value="" disabled>Chagua mdau</option>
                     {recipients.map(r => <option key={r.id} value={r.id}>{r.username} - {formatRole(r.role)} {r.village ? `(${r.village.name})` : ''}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Kichwa cha Habari</label>
-                  <input name="subject" value={formData.subject} onChange={handleChange} placeholder="Mfano: Ripoti ya Uchafuzi..." className="bmw-input" />
+                  <input name="subject" value={formData.subject} onChange={handleChange} placeholder="Mfano: Ripoti ya Uchafuzi..." className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maelezo</label>
-                  <textarea name="body" value={formData.body} onChange={handleChange} rows={6} required placeholder="Andika ujumbe wako hapa..." className="bmw-input" />
+                  <textarea name="body" value={formData.body} onChange={handleChange} rows={6} required placeholder="Andika ujumbe wako hapa..." className="m-textarea" />
                 </div>
                 <button type="submit" disabled={loading} className="btn-m-primary" style={{ height: "48px", marginTop: "12px", opacity: loading ? 0.7 : 1 }}>
                   {loading ? "Inatuma..." : "Tuma Ujumbe"}

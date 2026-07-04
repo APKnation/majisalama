@@ -64,7 +64,7 @@ export default function ReportDamage() {
         <form onSubmit={handleSubmit} style={{ background: "#0d0d0d", border: "1px solid #3c3c3c", padding: "48px" }} className="animate-fade-in-up flex flex-col gap-6">
           <div>
             <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Chanzo cha Maji <span style={{ color: "#e22718" }}>*</span></label>
-            <select name="water_source_id" required value={formData.water_source_id} onChange={handleChange} className="bmw-input">
+            <select name="water_source_id" required value={formData.water_source_id} onChange={handleChange} className="m-select">
               <option value="">Chagua chanzo...</option>
               {waterSources.map((source) => (
                 <option key={source.id} value={source.id}>{source.name} - {source.village?.name}</option>
@@ -74,12 +74,12 @@ export default function ReportDamage() {
 
           <div>
             <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Kichwa <span style={{ color: "#e22718" }}>*</span></label>
-            <input type="text" name="title" required placeholder="mf. Bomba limepasuka" value={formData.title} onChange={handleChange} className="bmw-input" />
+            <input type="text" name="title" required placeholder="mf. Bomba limepasuka" value={formData.title} onChange={handleChange} className="m-input" />
           </div>
 
           <div>
             <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Maelezo <span style={{ color: "#e22718" }}>*</span></label>
-            <textarea name="description" required rows={4} placeholder="Eleza uharibifu kwa undani..." value={formData.description} onChange={handleChange} className="bmw-input" />
+            <textarea name="description" required rows={4} placeholder="Eleza uharibifu kwa undani..." value={formData.description} onChange={handleChange} className="m-textarea" />
           </div>
 
           <div>
