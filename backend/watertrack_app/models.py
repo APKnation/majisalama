@@ -105,7 +105,7 @@ class DamageReport(models.Model):
     ]
     
     water_source = models.ForeignKey(WaterSource, on_delete=models.CASCADE, related_name='damage_reports')
-    reported_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_made')
+    reported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reports_made')
     report_date = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=200)
     description = models.TextField()

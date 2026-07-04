@@ -52,7 +52,7 @@ class WaterSourceViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'village__name']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'nearby']:
+        if self.action in ['list', 'retrieve', 'nearby', 'report_damage']:
             return [AllowAny()]
         return [IsAuthenticated()]
     
@@ -83,9 +83,10 @@ class WaterSourceViewSet(viewsets.ModelViewSet):
         serializer = DamageReportSerializer(data=request.data)
         
         if serializer.is_valid():
+            reported_by = request.user if request.user.is_authenticated else None
             serializer.save(
                 water_source=water_source,
-                reported_by=request.user,
+                reported_by=reported_by,
                 latitude=water_source.latitude,
                 longitude=water_source.longitude
             )
