@@ -8,9 +8,44 @@
 @import 'leaflet/dist/leaflet.css';
 
 body {
-  @apply bg-gray-50;
+  @apply bg-gray-50 text-gray-900;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .leaflet-container {
   @apply h-full w-full;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  .glass-dark {
+    @apply bg-gray-900/70 backdrop-blur-md border border-gray-700/50 shadow-2xl;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
 }

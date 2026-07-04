@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
+from django.db.models import Q
 from .models import *
 from .serializers import *
 
@@ -132,6 +133,15 @@ class DamageReportViewSet(viewsets.ModelViewSet):
             report.assigned_to = worker
             report.status = 'assigned'
             report.save()
+
+            # Create an automated alert
+            alert = Alert.objects.create(
+                water_source=report.water_source,
+                alert_type='general',
+                message=f"Umepewa kazi mpya kwenye ripoti: {report.title}"
+            )
+            alert.recipients.add(worker)
+
             return Response({'message': 'Kazi imepewa mafanikio'})
         except User.DoesNotExist:
             return Response({'error': 'Wafanyakazi hayupatikani'}, status=400)
@@ -145,6 +155,18 @@ class DamageReportViewSet(viewsets.ModelViewSet):
         report.resolved_at = timezone.now()
         report.resolution_notes = request.data.get('notes', '')
         report.save()
+
+        # Notify the reporter and the assigned worker
+        alert = Alert.objects.create(
+            water_source=report.water_source,
+            alert_type='general',
+            message=f"Ripoti yako imetatuliwa: {report.title}"
+        )
+        if report.reported_by:
+            alert.recipients.add(report.reported_by)
+        if report.assigned_to and report.assigned_to != report.reported_by:
+            alert.recipients.add(report.assigned_to)
+
         return Response({'message': 'Ripoti imetatuliwa'})
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -165,8 +187,21 @@ class UserViewSet(viewsets.ModelViewSet):
             return User.objects.none()
         if user.is_superuser or user.role == 'admin':
             return User.objects.all().order_by('username')
+        if user.role == 'district_officer':
+            return User.objects.filter(role__in=['village_leader', 'water_officer', 'district_officer']).order_by('username')
         if user.role == 'village_leader':
-            return User.objects.filter(village=user.village, role__in=['water_officer', 'village_leader']).order_by('username')
+            return User.objects.filter(
+                Q(village=user.village, role='water_officer') |
+                Q(role__in=['village_leader', 'district_officer'])
+            ).order_by('username')
+        if user.role == 'water_officer':
+            return User.objects.filter(
+                Q(village=user.village, role='village_leader') |
+                Q(role='district_officer') |
+                Q(id=user.id)
+            ).order_by('username')
+        if user.role == 'citizen':
+            return User.objects.filter(village=user.village, role='village_leader').order_by('username')
         return User.objects.filter(id=user.id)
 
 class MessageViewSet(viewsets.ModelViewSet):

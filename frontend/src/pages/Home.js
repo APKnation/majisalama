@@ -1,203 +1,221 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
+/* ─── Spotify colour tokens as Tailwind arbitrary values ─────────────────
+   #121212  page bg          → bg-[#121212]
+   #181818  section dark     → bg-[#181818]
+   #282828  card             → bg-[#282828]
+   #3E3E3E  card hover       → hover:bg-[#3E3E3E]
+   #1DB954  spotify green    → text-[#1DB954]  bg-[#1DB954]  border-[#1DB954]
+   #1ed760  green hover      → hover:bg-[#1ed760]
+   #B3B3B3  muted text       → text-[#B3B3B3]
+──────────────────────────────────────────────────────────────────────── */
+
+function MediaCard({ src, title, desc }) {
+  return (
+    <div className="bg-[#282828] hover:bg-[#3E3E3E] rounded-lg overflow-hidden cursor-pointer transition-colors duration-200 pb-4">
+      <img src={src} alt={title} className="w-full h-40 object-cover block" />
+      <div className="px-4 pt-3">
+        <h3 className="text-sm font-bold mb-1 text-white">{title}</h3>
+        <p className="text-xs text-[#B3B3B3] leading-relaxed">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function StepCard({ num, title, desc }) {
+  return (
+    <div className="bg-[#282828] hover:bg-[#3E3E3E] rounded-lg p-5 border-l-[3px] border-[#1DB954] transition-colors duration-200">
+      <p className="text-xs font-bold text-[#1DB954] tracking-widest uppercase mb-2">
+        Step {num}
+      </p>
+      <h4 className="text-sm font-bold mb-1.5 text-white">{title}</h4>
+      <p className="text-xs text-[#B3B3B3] leading-relaxed">{desc}</p>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="relative overflow-hidden bg-gradient-to-br from-cyan-600 via-sky-500 to-blue-700 px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.4),_transparent_35%)]" />
-        <div className="relative max-w-6xl mx-auto grid gap-8 lg:gap-12 lg:grid-cols-2 items-center">
-          <div className="space-y-4 sm:space-y-6 text-white">
-           
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
-              Pata huduma ya maji bora kwa jamii yako.
+    <div className="bg-[#121212] text-white min-h-screen font-sans">
+      {/* ── HERO ── */}
+      <header
+        className="relative overflow-hidden px-8 pt-14 pb-16"
+        style={{
+          background: "linear-gradient(180deg, #1a3a1a 0%, #121212 100%)",
+        }}
+      >
+        {/* ambient glow blob */}
+        <div
+          className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-[#1DB954] rounded-full opacity-[0.08] pointer-events-none"
+          style={{ filter: "blur(60px)" }}
+        />
+
+        <div className="relative max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* left: copy */}
+          <div>
+            {/* live badge */}
+            
+
+            <h1 className="text-4xl lg:text-[42px] font-black leading-[1.1] tracking-tight mb-5">
+              Pata huduma ya maji bora kwa{" "}
+              <span className="text-[#1DB954]">jamii yako.</span>
             </h1>
-            <p className="max-w-xl text-base sm:text-lg leading-7 sm:leading-8 text-cyan-100/90">
+
+            <p className="text-[15px] leading-relaxed text-[#B3B3B3] mb-8 max-w-md">
               WaterTrack inakuwezesha kuona vyanzo vya maji, ripoti matatizo,
               kufuatilia kazi za matengenezo na kutoa huduma salama kwa wananchi
               bila kufunga akaunti.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <Link
-                to="/map"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 sm:px-8 py-2.5 sm:py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/10 hover:bg-slate-100 transition"
-              >
-                Angalia Ramani
-              </Link>
+
+            <div className="flex flex-wrap gap-3">
+             
               <Link
                 to="/report"
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 sm:px-8 py-2.5 sm:py-3 text-sm font-semibold text-white hover:bg-slate-800 transition"
+                className="bg-transparent hover:bg-white/5 text-white font-bold text-sm tracking-wider uppercase rounded-full px-8 py-3.5 border border-white/30 hover:border-white transition-all duration-150"
               >
                 Ripoti Uharibifu
               </Link>
             </div>
           </div>
-          <div className="hidden lg:block">
-            <article className="overflow-hidden rounded-2xl lg:rounded-[2rem] bg-white shadow-lg sm:shadow-xl lg:shadow-2xl shadow-slate-900/10">
-              <img
-                src="/tank1.png"
-                alt="Tanki la maji"
-                className="h-64 lg:h-80 w-full object-cover"
-              />
-              <div className="p-6 lg:p-8">
-                <h2 className="text-xl lg:text-2xl font-semibold text-slate-900">
-                  Tanki la Maji
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-slate-600">
-                  Chunguza miundombinu ya uhifadhi wa maji na uhakikishe jinsi
-                  inavyotumika kwa usalama.
-                </p>
-              </div>
-            </article>
+
+          {/* right: card — hidden on mobile */}
+          <div className="hidden lg:block bg-[#282828] rounded-xl overflow-hidden">
+            <img
+              src="/tank1.png"
+              alt="Tanki la maji"
+              className="w-full h-56 object-cover block"
+            />
+            <div className="p-5">
+             
+              <p className="text-sm text-[#B3B3B3] leading-relaxed">
+                Chunguza miundombinu ya uhifadhi wa maji na uhakikishe jinsi
+                inavyotumika kwa usalama.
+              </p>
+            </div>
           </div>
         </div>
       </header>
 
-      <section className="py-12 sm:py-16 lg:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            <article className="overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-[2rem] bg-slate-50 shadow-lg sm:shadow-xl shadow-slate-900/10 hover:shadow-2xl transition">
-              <img
-                src="/kuchota maji.png"
-                alt="Wananchi wakichota maji"
-                className="h-48 sm:h-56 lg:h-64 w-full object-cover"
-              />
-              <div className="p-5 sm:p-6 lg:p-8">
-                <h2 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  Wananchi wakichota maji
-                </h2>
-                <p className="mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
-                  Pata taarifa za upatikanaji wa maji na maeneo ya kuchota maji
-                  kwa wakazi.
-                </p>
-              </div>
-            </article>
-            <article className="overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-[2rem] bg-slate-50 shadow-lg sm:shadow-xl shadow-slate-900/10 hover:shadow-2xl transition">
-              <img
-                src="/tank2.png"
-                alt="Watu wakifurahia huduma ya maji"
-                className="h-48 sm:h-56 lg:h-64 w-full object-cover"
-              />
-              <div className="p-5 sm:p-6 lg:p-8">
-                <h2 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  Huduma ya Kuaminika
-                </h2>
-                <p className="mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
-                  Onyesha jinsi mfumo unavyoboresha maisha na huduma za maji kwa
-                  jamii.
-                </p>
-              </div>
-            </article>
-            <article className="overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-[2rem] bg-slate-50 shadow-lg sm:shadow-xl shadow-slate-900/10 hover:shadow-2xl transition">
-              <img
-                src="/tank1.png"
-                alt="Watu wakishughulikia matengenezo ya bomba"
-                className="h-48 sm:h-56 lg:h-64 w-full object-cover"
-              />
-              <div className="p-5 sm:p-6 lg:p-8">
-                <h2 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  Matengenezo ya Mabomba
-                </h2>
-                <p className="mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
-                  Fuata kazi za matengenezo, upate taarifa za hali ya mabomba na
-                  miundombinu.
-                </p>
-              </div>
-            </article>
+      {/* ── MEDIA CARDS ── */}
+      <section className="px-8 py-12">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <MediaCard
+            src="/kuchota maji.png"
+            title="Wananchi wakichota maji"
+            desc="Pata taarifa za upatikanaji wa maji na maeneo ya kuchota maji kwa wakazi."
+          />
+          <MediaCard
+            src="/tank2.png"
+            title="Huduma ya Kuaminika"
+            desc="Onyesha jinsi mfumo unavyoboresha maisha na huduma za maji kwa jamii."
+          />
+          <MediaCard
+            src="/tank1.png"
+            title="Matengenezo ya Mabomba"
+            desc="Fuata kazi za matengenezo, upate taarifa za hali ya mabomba na miundombinu."
+          />
+        </div>
+      </section>
+
+      <hr className="border-none border-t border-white/[0.07] mx-8" />
+
+      {/* ── HOW IT WORKS ── */}
+      <section className="bg-[#181818]">
+        <div className="max-w-5xl mx-auto px-8 py-12">
+          <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#1DB954] mb-3">
+            Mienendo ya Mfumo
+          </p>
+          <h2 className="text-3xl lg:text-[32px] font-black tracking-tight mb-3">
+            Mfumo unaoweka kila mtumiaji katikati
+          </h2>
+          <p className="text-[15px] text-[#B3B3B3] leading-relaxed mb-9 max-w-md">
+            WaterTrack ni mfumo wa wazi ambao hutoa taarifa kwa wananchi,
+            viongozi wa vijiji, wafanyakazi wa maji na wilaya bila haja ya
+            kuingia ndani ya mfumo.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <StepCard
+              num="01"
+              title="Ripoti bila kusubiri"
+              desc="Mwananchi anaweza kuripoti uharibifu au upungufu wa maji haraka kupitia ukurasa ulio wazi."
+            />
+            <StepCard
+              num="02"
+              title="Ufuatiliaji wa chanzo"
+              desc="Wafanyakazi wa maji wana uangalizi wa vyanzo, matengenezo na taarifa za ubora kutoka kwa mfumo."
+            />
+            <StepCard
+              num="03"
+              title="Taarifa kwa viongozi"
+              desc="Viongozi wa vijiji na wilaya wanaweza kuona ripoti, maendeleo na mahitaji ya matengenezo kwa urahisi."
+            />
+            <StepCard
+              num="04"
+              title="Jamii yenye furaha"
+              desc="Mfumo unaleta huduma ya maji yenye uhakika na jamii inapata maji safi kwa wakati."
+            />
           </div>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 lg:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 lg:gap-12 lg:grid-cols-2 lg:items-center">
-            <div className="space-y-4 sm:space-y-6">
-              <p className="text-xs sm:text-sm uppercase tracking-[0.4em] text-slate-500">
-                Mienendo ya Mfumo
-              </p>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900">
-                Mfumo unaoweka kila mtumiaji katikati
-              </h2>
-              <p className="text-base sm:text-lg leading-7 sm:leading-8 text-slate-600">
-                WaterTrack ni mfumo wa wazi ambao hutoa taarifa kwa wananchi,
-                viongozi wa vijiji, wafanyakazi wa maji na wilaya bila haja ya
-                kuingia ndani ya mfumo. Inakuwezesha kuchunguza, kuripoti,
-                kuchukua hatua na kufurahia huduma ya maji bora.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
-              <div className="rounded-2xl lg:rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6 lg:p-8">
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  1. Ripoti bila kusubiri
-                </h3>
-                <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
-                  Mwananchi anaweza kuripoti uharibifu au upungufu wa maji
-                  haraka kupitia ukurasa ulio wazi.
+      {/* ── FEATURES ── */}
+      <section className="px-8 py-12">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5">
+            {[
+              {
+                icon: "👥",
+                title: "Huduma kwa Watumiaji Wote",
+                desc: "Wananchi, viongozi, wataalam wa maji na wilaya wanaona hali ya maji kwa mtiririko mmoja wa taarifa.",
+              },
+              {
+                icon: "👁",
+                title: "Uwazi wa Taarifa",
+                desc: "Kila taarifa ya chanzo, ripoti na matengenezo inapatikana kwa watoa huduma na jamii.",
+              },
+              {
+                icon: "⚡",
+                title: "Uendeshaji wa Haraka",
+                desc: "Mfumo unaweka kipaumbele kwa ripoti na kuhakikisha kazi ya matengenezo inaanza haraka.",
+              },
+            ].map((f, i) => (
+              <div
+                key={i}
+                className={`bg-[#282828] p-7 ${
+                  i === 0 ? "rounded-l-lg" : i === 2 ? "rounded-r-lg" : ""
+                }`}
+              >
+                <div className="w-10 h-10 bg-[#1DB954]/15 rounded-full flex items-center justify-center text-lg mb-4">
+                  {f.icon}
+                </div>
+                <h3 className="text-[15px] font-bold mb-2">{f.title}</h3>
+                <p className="text-sm text-[#B3B3B3] leading-relaxed">
+                  {f.desc}
                 </p>
               </div>
-              <div className="rounded-2xl lg:rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6 lg:p-8">
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  2. Ufuatiliaji wa chanzo
-                </h3>
-                <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
-                  Wafanyakazi wa maji wana uangalizi wa vyanzo, matengenezo na
-                  taarifa za ubora kutoka kwa mfumo.
-                </p>
-              </div>
-              <div className="rounded-2xl lg:rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6 lg:p-8">
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  3. Taarifa kwa viongozi
-                </h3>
-                <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
-                  Viongozi wa vijiji na wilaya wanaweza kuona ripoti, maendeleo
-                  na mahitaji ya matengenezo kwa urahisi.
-                </p>
-              </div>
-              <div className="rounded-2xl lg:rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6 lg:p-8">
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  4. Jamii yenye furaha
-                </h3>
-                <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
-                  Mfumo unaleta huduma ya maji yenye uhakika na jamii inapata
-                  maji safi kwa wakati.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 lg:py-20 bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-            <div className="rounded-2xl lg:rounded-3xl bg-slate-800/90 p-6 sm:p-7 lg:p-8">
-              <h3 className="text-xl sm:text-2xl font-semibold">
-                Huduma kwa Watumiaji Wote
-              </h3>
-              <p className="mt-3 sm:mt-4 text-slate-300 text-xs sm:text-sm leading-6">
-                Wananchi, viongozi, wataalam wa maji na wilaya wanaona hali ya
-                maji kwa mtiririko mmoja wa taarifa.
-              </p>
-            </div>
-            <div className="rounded-2xl lg:rounded-3xl bg-slate-800/90 p-6 sm:p-7 lg:p-8">
-              <h3 className="text-xl sm:text-2xl font-semibold">
-                Uwazi wa Taarifa
-              </h3>
-              <p className="mt-3 sm:mt-4 text-slate-300 text-xs sm:text-sm leading-6">
-                Kila taarifa ya chanzo, ripoti na matengenezo inapatikana kwa
-                watoa huduma na jamii.
-              </p>
-            </div>
-            <div className="rounded-2xl lg:rounded-3xl bg-slate-800/90 p-6 sm:p-7 lg:p-8">
-              <h3 className="text-xl sm:text-2xl font-semibold">
-                Uendeshaji wa Haraka
-              </h3>
-              <p className="mt-3 sm:mt-4 text-slate-300 text-xs sm:text-sm leading-6">
-                Mfumo unaweka kipaumbele kwa ripoti na kuhakikisha kazi ya
-                matengenezo inaanza haraka.
-              </p>
-            </div>
-          </div>
+      {/* ── CTA ── */}
+      <section className="bg-[#1DB954] px-8 py-14 text-center">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-4xl font-black text-black tracking-tight mb-3">
+            Anza leo. Bure.
+          </h2>
+          <p className="text-[15px] text-black/60 mb-7">
+            Jiunge na jamii zinazotumia WaterTrack kufuatilia na kuboresha
+            huduma ya maji.
+          </p>
+          <Link
+            to="/report"
+            className="bg-black hover:bg-[#1a1a1a] text-white font-bold text-sm tracking-widest uppercase rounded-full px-10 py-4 inline-block transition-all duration-150 hover:scale-105"
+          >
+            Anza Sasa
+          </Link>
         </div>
       </section>
     </div>
