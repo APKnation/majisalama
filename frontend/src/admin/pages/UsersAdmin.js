@@ -136,40 +136,40 @@ export default function UsersAdmin() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Jina la mtumiaji</label>
-                  <input type="text" value={formData.username} onChange={(e) => setFormData({...formData, username: e.target.value})} required className="bmw-input" />
+                  <input type="text" value={formData.username} onChange={(e) => setFormData({...formData, username: e.target.value})} required className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Barua pepe</label>
-                  <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="bmw-input" />
+                  <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Jina la kwanza</label>
-                  <input type="text" value={formData.first_name} onChange={(e) => setFormData({...formData, first_name: e.target.value})} className="bmw-input" />
+                  <input type="text" value={formData.first_name} onChange={(e) => setFormData({...formData, first_name: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Jina la mwisho</label>
-                  <input type="text" value={formData.last_name} onChange={(e) => setFormData({...formData, last_name: e.target.value})} className="bmw-input" />
+                  <input type="text" value={formData.last_name} onChange={(e) => setFormData({...formData, last_name: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Simu</label>
-                  <input type="text" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="bmw-input" />
+                  <input type="text" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="m-input" />
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Sehemu</label>
-                  <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} className="bmw-input">
+                  <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} className="m-select">
                     {ROLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Kijiji</label>
-                  <select value={formData.village_id} onChange={(e) => setFormData({...formData, village_id: e.target.value})} className="bmw-input">
+                  <select value={formData.village_id} onChange={(e) => setFormData({...formData, village_id: e.target.value})} className="m-select">
                     <option value="">Chagua kijiji</option>
                     {villages.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>Nenosiri</label>
-                  <input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="bmw-input" placeholder={editingUser ? "Acha wazi usipobadili" : ""} />
+                  <input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="m-input" placeholder={editingUser ? "Acha wazi usipobadili" : ""} />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
