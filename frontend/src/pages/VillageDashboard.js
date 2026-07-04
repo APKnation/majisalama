@@ -2,69 +2,58 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 
+function StatCard({ label, value, accent }) {
+  return (
+    <div style={{ background: "#000000", borderTop: `2px solid ${accent}`, padding: "20px 24px" }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = "#0d0d0d")}
+      onMouseLeave={(e) => (e.currentTarget.style.background = "#000000")}
+    >
+      <p style={{ color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>{label}</p>
+      <p style={{ color: "#ffffff", fontSize: "36px", fontWeight: 700, lineHeight: 1 }}>{value}</p>
+    </div>
+  );
+}
+
 export default function VillageDashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    totalSources: 0,
-    safeSources: 0,
-    unsafeSources: 0,
-    pendingReports: 0,
-  });
-  const [villageName, setVillageName] = useState("");
+  const [stats, setStats] = useState({ totalSources: 0, safeSources: 0, pendingReports: 0, totalWorkers: 0 });
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  useEffect(() => { if (user?.village?.id) fetchData(); }, [user]);
 
-  const fetchDashboardData = async () => {
+  const fetchData = async () => {
     try {
-      const sourcesRes = await api.get("/water-sources/");
-      const reportsRes = await api.get("/damage-reports/");
-
-      const sources = sourcesRes.data.results || sourcesRes.data;
-      const reports = reportsRes.data.results || reportsRes.data;
-
-      const villageSources = sources.filter(s => s.village?.id === user?.village?.id);
-
+      const [sRes, rRes] = await Promise.all([
+        api.get(`/water-sources/?village=${user.village.id}`),
+        api.get("/damage-reports/"),
+      ]);
+      const s = sRes.data.results || sRes.data;
+      const r = rRes.data.results || rRes.data;
       setStats({
-        totalSources: villageSources.length,
-        safeSources: villageSources.filter(s => s.status === "safe").length,
-        unsafeSources: villageSources.filter(s => s.status === "unsafe").length,
-        pendingReports: reports.filter(r => r.status === "pending" && r.water_source?.village?.id === user?.village?.id).length,
+        totalSources: s.length,
+        safeSources: s.filter(x => x.status === "safe").length,
+        pendingReports: r.filter(x => x.status === "pending").length,
+        totalWorkers: 0,
       });
-
-      if (user?.village) {
-        setVillageName(user.village.name);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    } catch (e) { console.error(e); }
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Kiongozi wa Kijiji</h1>
-        <p className="text-gray-600 mt-1">Karibu, {user?.username}</p>
-        {villageName && <p className="text-blue-600 font-medium">{villageName}</p>}
-      </div>
+    <div style={{ background: "#000000", minHeight: "100vh", color: "#ffffff" }}>
+      <div className="m-stripe" />
+      <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "40px 32px" }}>
+        <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>
+          Kiongozi wa Kijiji · {user?.village?.name}
+        </p>
+        <h1 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 700, textTransform: "uppercase", marginBottom: "8px" }}>
+          Karibu, {user?.first_name || user?.username}
+        </h1>
+        <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300, marginBottom: "40px" }}>Muhtasari wa hali ya kijiji chako.</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <p className="text-sm text-gray-600">Vyanzo vya Maji</p>
-          <p className="text-3xl font-bold text-gray-900">{stats.totalSources}</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <p className="text-sm text-gray-600">Salama</p>
-          <p className="text-3xl font-bold text-green-600">{stats.safeSources}</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <p className="text-sm text-gray-600">Hatarini</p>
-          <p className="text-3xl font-bold text-red-600">{stats.unsafeSources}</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <p className="text-sm text-gray-600">Ripoti Zinazosubiri</p>
-          <p className="text-3xl font-bold text-yellow-600">{stats.pendingReports}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "#3c3c3c" }}>
+          <StatCard label="Vyanzo Vyote"        value={stats.totalSources}   accent="#0066b1" />
+          <StatCard label="Salama"              value={stats.safeSources}    accent="#0fa336" />
+          <StatCard label="Ripoti Zinazosubiri" value={stats.pendingReports} accent="#f4b400" />
+          <StatCard label="Wafanyakazi"         value={stats.totalWorkers}   accent="#1c69d4" />
         </div>
       </div>
     </div>
