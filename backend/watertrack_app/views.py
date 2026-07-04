@@ -101,6 +101,8 @@ class DamageReportViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'priority', 'water_source__village', 'assigned_to']
 
     def get_permissions(self):
+        if self.action == 'recent':
+            return [AllowAny()]
         if self.action == 'assign':
             return [IsAuthenticated(), IsVillageLeaderOrAdmin()]
         return [IsAuthenticated()]
@@ -118,7 +120,13 @@ class DamageReportViewSet(viewsets.ModelViewSet):
         return DamageReport.objects.none()
 
     def perform_create(self, serializer):
-        serializer.save(reported_by=self.request.user)
+        serializer.save(reported_by=self.request.user if self.request.user.is_authenticated else None)
+
+    @action(detail=False, methods=['get'])
+    def recent(self, request):
+        reports = DamageReport.objects.all().order_by('-report_date')[:6]
+        serializer = self.get_serializer(reports, many=True)
+        return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
     def assign(self, request, pk=None):
