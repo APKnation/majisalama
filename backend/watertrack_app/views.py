@@ -101,7 +101,7 @@ class DamageReportViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'priority', 'water_source__village', 'assigned_to']
 
     def get_permissions(self):
-        if self.action in ['assign', 'resolve']:
+        if self.action == 'assign':
             return [IsAuthenticated(), IsVillageLeaderOrAdmin()]
         return [IsAuthenticated()]
 
@@ -148,10 +148,24 @@ class DamageReportViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Wafanyakazi hayupatikani'}, status=400)
 
     @action(detail=True, methods=['post'])
+    def in_progress(self, request, pk=None):
+        report = self.get_object()
+        if request.user.role == 'water_officer' and report.assigned_to != request.user:
+            return Response({'error': 'Hauna ruhusa. Kazi hii haijapangiwa wewe.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        report.status = 'in_progress'
+        report.save()
+        return Response({'message': 'Ripoti sasa inafanyiwa kazi'})
+
+    @action(detail=True, methods=['post'])
     def resolve(self, request, pk=None):
         report = self.get_object()
         if request.user.role == 'village_leader' and report.water_source.village != request.user.village:
             return Response({'error': 'Hauna ruhusa ya kutatua ripoti hii'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if request.user.role == 'water_officer' and report.assigned_to != request.user:
+            return Response({'error': 'Hauna ruhusa. Kazi hii haijapangiwa wewe.'}, status=status.HTTP_403_FORBIDDEN)
+
         report.status = 'resolved'
         report.resolved_at = timezone.now()
         report.resolution_notes = request.data.get('notes', '')
