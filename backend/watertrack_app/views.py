@@ -103,8 +103,6 @@ class DamageReportViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'recent':
             return [AllowAny()]
-        if self.action == 'assign':
-            return [IsAuthenticated(), IsVillageLeaderOrAdmin()]
         return [IsAuthenticated()]
 
     def get_queryset(self):
@@ -112,15 +110,33 @@ class DamageReportViewSet(viewsets.ModelViewSet):
         if user.is_superuser or user.role == 'admin':
             return DamageReport.objects.all()
         if user.role == 'village_leader':
-            return DamageReport.objects.filter(water_source__village=user.village)
+            # Mwenyekiti anaona ripoti za kijiji chake zinazomsubiri
+            return DamageReport.objects.filter(
+                water_source__village=user.village,
+                status__in=['pending_village', 'village_approved', 'forwarded_to_district',
+                            'rejected', 'assigned', 'in_progress', 'resolved', 'closed', 'pending']
+            )
         if user.role == 'water_officer':
-            return DamageReport.objects.filter(assigned_to=user)
+            # Afisa wa maji anaona zilizoidhinishwa na kijiji chake
+            return DamageReport.objects.filter(
+                water_source__village=user.village,
+                status__in=['village_approved', 'forwarded_to_district',
+                            'assigned', 'in_progress', 'resolved']
+            )
+        if user.role == 'district_officer':
+            # Ofisa wa wilaya anaona zilizotumwa na zilizopewa wafanyakazi
+            return DamageReport.objects.filter(
+                status__in=['forwarded_to_district', 'assigned', 'in_progress', 'resolved']
+            )
         if user.role == 'citizen':
             return DamageReport.objects.filter(reported_by=user)
         return DamageReport.objects.none()
 
     def perform_create(self, serializer):
-        serializer.save(reported_by=self.request.user if self.request.user.is_authenticated else None)
+        serializer.save(
+            reported_by=self.request.user if self.request.user.is_authenticated else None,
+            status='pending_village'
+        )
 
     @action(detail=False, methods=['get'])
     def recent(self, request):
@@ -129,31 +145,113 @@ class DamageReportViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
-    def assign(self, request, pk=None):
+    def village_approve(self, request, pk=None):
+        """Mwenyekiti wa kijiji anaidhibitia ripoti."""
         report = self.get_object()
-        if request.user.role == 'village_leader' and report.water_source.village != request.user.village:
-            return Response({'error': 'Hauna ruhusa ya kugawa ripoti hii'}, status=status.HTTP_403_FORBIDDEN)
+        if request.user.role not in ['village_leader', 'admin'] and not request.user.is_superuser:
+            return Response({'error': 'Hauna ruhusa ya kuidhibitia ripoti hii.'}, status=status.HTTP_403_FORBIDDEN)
+        if report.water_source.village != request.user.village and request.user.role == 'village_leader':
+            return Response({'error': 'Ripoti hii si ya kijiji chako.'}, status=status.HTTP_403_FORBIDDEN)
+        if report.status != 'pending_village':
+            return Response({'error': f'Ripoti hii iko katika hali "{report.status}" na haiwezi kuidhibitiwa tena.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        report.status = 'village_approved'
+        report.village_approved_by = request.user
+        report.village_approved_at = timezone.now()
+        report.save()
+
+        # Tuma arifa kwa water_officer wa kijiji hicho
+        officers = User.objects.filter(village=report.water_source.village, role='water_officer')
+        if officers.exists():
+            alert = Alert.objects.create(
+                water_source=report.water_source,
+                alert_type='damage',
+                message=f"Ripoti mpya imeidhinishwa na mwenyekiti: {report.title}. Tafadhali iangalie."
+            )
+            alert.recipients.set(officers)
+
+        return Response({'message': 'Ripoti imeidhibitiwa. Afisa wa Maji ataarifiwa.'})
+
+    @action(detail=True, methods=['post'])
+    def village_reject(self, request, pk=None):
+        """Mwenyekiti wa kijiji anakataa ripoti."""
+        report = self.get_object()
+        if request.user.role not in ['village_leader', 'admin'] and not request.user.is_superuser:
+            return Response({'error': 'Hauna ruhusa ya kukataa ripoti hii.'}, status=status.HTTP_403_FORBIDDEN)
+        if report.water_source.village != request.user.village and request.user.role == 'village_leader':
+            return Response({'error': 'Ripoti hii si ya kijiji chako.'}, status=status.HTTP_403_FORBIDDEN)
+        if report.status not in ['pending_village', 'village_approved']:
+            return Response({'error': 'Ripoti hii haiwezi kukataliwa katika hali yake ya sasa.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        reason = request.data.get('reason', '')
+        report.status = 'rejected'
+        report.rejection_reason = reason
+        report.save()
+
+        # Arifa mripoti
+        if report.reported_by:
+            alert = Alert.objects.create(
+                water_source=report.water_source,
+                alert_type='general',
+                message=f"Ripoti yako imekataliwa: {report.title}. Sababu: {reason or 'Haikutolewa'}"
+            )
+            alert.recipients.add(report.reported_by)
+
+        return Response({'message': 'Ripoti imekataliwa.'})
+
+    @action(detail=True, methods=['post'])
+    def forward_to_district(self, request, pk=None):
+        """Afisa wa Maji anatuma ripoti kwa Ofisa wa Wilaya."""
+        report = self.get_object()
+        if request.user.role not in ['water_officer', 'admin'] and not request.user.is_superuser:
+            return Response({'error': 'Ni Afisa wa Maji tu anayeweza kutuma ripoti kwa Wilaya.'}, status=status.HTTP_403_FORBIDDEN)
+        if report.status != 'village_approved':
+            return Response({'error': f'Ripoti lazima iwe katika hali "village_approved" kwanza. Hali ya sasa: {report.status}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        report.status = 'forwarded_to_district'
+        report.forwarded_by = request.user
+        report.forwarded_at = timezone.now()
+        report.save()
+
+        # Tuma arifa kwa district_officer wote
+        district_officers = User.objects.filter(role='district_officer')
+        if district_officers.exists():
+            alert = Alert.objects.create(
+                water_source=report.water_source,
+                alert_type='damage',
+                message=f"Ripoti mpya imetumwa kutoka kijiji cha {report.water_source.village}: {report.title}. Tafadhali ipe mfanyakazi."
+            )
+            alert.recipients.set(district_officers)
+
+        return Response({'message': 'Ripoti imetumwa kwa Ofisa wa Wilaya.'})
+
+    @action(detail=True, methods=['post'])
+    def assign(self, request, pk=None):
+        """Ofisa wa Wilaya anapanga ripoti kwa mfanyakazi."""
+        report = self.get_object()
+        if request.user.role not in ['district_officer', 'admin'] and not request.user.is_superuser:
+            return Response({'error': 'Ni Ofisa wa Wilaya tu anayeweza kupanga kazi.'}, status=status.HTTP_403_FORBIDDEN)
+        if report.status not in ['forwarded_to_district', 'assigned']:
+            return Response({'error': 'Ripoti lazima iwe na hali "forwarded_to_district" ili kupangwa.'}, status=status.HTTP_400_BAD_REQUEST)
 
         worker_id = request.data.get('worker_id')
         try:
             worker = User.objects.get(id=worker_id, role='water_officer')
-            if request.user.role == 'village_leader' and worker.village != request.user.village:
-                return Response({'error': 'Mafanyakazi lazima awe wa kijiji chako'}, status=status.HTTP_400_BAD_REQUEST)
             report.assigned_to = worker
             report.status = 'assigned'
             report.save()
 
-            # Create an automated alert
+            # Arifa mfanyakazi
             alert = Alert.objects.create(
                 water_source=report.water_source,
                 alert_type='general',
-                message=f"Umepewa kazi mpya kwenye ripoti: {report.title}"
+                message=f"Umepewa kazi mpya: {report.title}. Tafadhali anza mara moja."
             )
             alert.recipients.add(worker)
 
-            return Response({'message': 'Kazi imepewa mafanikio'})
+            return Response({'message': f'Kazi imepewa {worker.username} mafanikio.'})
         except User.DoesNotExist:
-            return Response({'error': 'Wafanyakazi hayupatikani'}, status=400)
+            return Response({'error': 'Mfanyakazi huyo hayupatikani.'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def in_progress(self, request, pk=None):

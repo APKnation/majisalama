@@ -97,11 +97,18 @@ class DamageReport(models.Model):
     ]
     
     STATUS_CHOICES = [
-        ('pending', 'Inasubiri'),
-        ('assigned', 'Imepewa Wafanyakazi'),
-        ('in_progress', 'Inafanywa Kazi'),
-        ('resolved', 'Imetatuliwa'),
-        ('closed', 'Imefungwa'),
+        # --- Mtiririko Mpya ---
+        ('pending_village',       'Inasubiri Idhini ya Mwenyekiti'),
+        ('village_approved',      'Imeidhinishwa na Mwenyekiti'),
+        ('forwarded_to_district', 'Imetumwa kwa Wilaya'),
+        ('rejected',              'Imekataliwa'),
+        # --- Hatua za Kazi ---
+        ('assigned',              'Imepewa Wafanyakazi'),
+        ('in_progress',           'Inafanywa Kazi'),
+        ('resolved',              'Imetatuliwa'),
+        ('closed',                'Imefungwa'),
+        # --- Legacy (zamani) ---
+        ('pending',               'Inasubiri (Zamani)'),
     ]
     
     water_source = models.ForeignKey(WaterSource, on_delete=models.CASCADE, related_name='damage_reports')
@@ -110,13 +117,25 @@ class DamageReport(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending_village')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     images = models.JSONField(default=list, blank=True)
     assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_reports')
     resolved_at = models.DateTimeField(null=True, blank=True)
     resolution_notes = models.TextField(blank=True)
+    # --- Mtiririko wa Idhini ---
+    village_approved_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='village_approved_reports'
+    )
+    village_approved_at = models.DateTimeField(null=True, blank=True)
+    forwarded_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='forwarded_reports'
+    )
+    forwarded_at = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(blank=True)
     
     class Meta:
         ordering = ['-report_date']
