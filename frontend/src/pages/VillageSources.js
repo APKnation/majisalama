@@ -64,8 +64,16 @@ function SpecRow({ label, value }) {
 export default function VillageSources() {
   const { user } = useAuth();
   const [sources, setSources] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [view, setView] = useState("grid"); // "grid" | "table"
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [form, setForm] = useState({
+    name: "", source_type: "shallow_well", status: "safe",
+    ph_level: "", bacteria_count: "", iron_level: ""
+  });
+
 
   useEffect(() => {
     if (user?.village?.id) {
@@ -85,6 +93,39 @@ export default function VillageSources() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setSaving(true); setError(""); setSuccess("");
+    try {
+      const payload = {
+        ...form,
+        village_id: user?.village?.id,
+        ph_level: form.ph_level || null,
+        bacteria_count: form.bacteria_count || null,
+        iron_level: form.iron_level || null,
+      };
+      await api.post("/water-sources/", payload);
+      setSuccess("Chanzo kipya kimeongezwa kikamilifu!");
+      setShowForm(false);
+      setForm({ name: "", source_type: "shallow_well", status: "safe", ph_level: "", bacteria_count: "", iron_level: "" });
+      fetchSources();
+    } catch (e) {
+      setError(e.response?.data?.detail || "Hitilafu imetokea. Tafadhali jaribu tena.");
+    } finally { setSaving(false); }
+  };
+
+  const inputStyle = {
+    width: "100%", padding: "12px 14px", background: "#1a1a1a",
+    border: "1px solid #3c3c3c", color: "#ffffff", fontSize: "14px",
+    outline: "none", boxSizing: "border-box",
+  };
+  const labelStyle = {
+    display: "block", color: "#7e7e7e", fontSize: "10px",
+    fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "7px",
   };
 
   // ── Loading skeleton ───────────────────────────────────────────────
@@ -163,17 +204,99 @@ export default function VillageSources() {
       <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "40px 32px" }}>
 
         {/* ─── PAGE TITLE ─── */}
-        <div style={{ marginBottom: "40px" }} className="animate-fade-in-up">
-          <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>
-            {user?.village?.name || "Kijiji"} · {user?.village?.district}
-          </p>
-          <h1 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700, textTransform: "uppercase", lineHeight: 1.05, marginBottom: "8px" }}>
-            Vyanzo vya Maji
-          </h1>
-          <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300 }}>
-            Orodha ya vyanzo vya maji ndani ya kijiji chako — vyanzo {sources.length} vinapatikana.
-          </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "40px", flexWrap: "wrap", gap: "16px" }} className="animate-fade-in-up">
+          <div>
+            <p style={{ color: "#0066b1", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "10px" }}>
+              {user?.village?.name || "Kijiji"} · {user?.village?.district}
+            </p>
+            <h1 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700, textTransform: "uppercase", lineHeight: 1.05, marginBottom: "8px" }}>
+              Vyanzo vya Maji
+            </h1>
+            <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300 }}>
+              Orodha ya vyanzo vya maji ndani ya kijiji chako — vyanzo {sources.length} vinapatikana.
+            </p>
+          </div>
+          <button
+            onClick={() => { setShowForm(!showForm); setError(""); setSuccess(""); }}
+            style={{
+              padding: "0 24px", height: "42px", background: showForm ? "transparent" : "#0066b1",
+              color: showForm ? "#7e7e7e" : "#ffffff", border: `1px solid ${showForm ? "#3c3c3c" : "#0066b1"}`,
+              fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase",
+              cursor: "pointer", transition: "all 0.15s",
+            }}
+          >
+            {showForm ? "✕ Ghairi" : "+ Ongeza Chanzo"}
+          </button>
         </div>
+
+        {/* Success */}
+        {success && (
+          <div style={{ background: "#012010", border: "1px solid #0fa336", padding: "14px 20px", marginBottom: "20px", color: "#0fa336", fontSize: "13px" }}>
+            ✅ {success}
+          </div>
+        )}
+
+        {/* Add Source Form */}
+        {showForm && (
+          <form onSubmit={handleSubmit} style={{ background: "#0d0d0d", border: "1px solid #3c3c3c", padding: "32px", marginBottom: "32px" }} className="animate-fade-in-up">
+            <p style={{ color: "#ffffff", fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "24px" }}>
+              Chanzo Kipya Cha Maji
+            </p>
+            {error && (
+              <div style={{ background: "#2d0808", border: "1px solid #e74c3c", padding: "12px 16px", marginBottom: "20px", color: "#e74c3c", fontSize: "13px" }}>
+                ⚠️ {error}
+              </div>
+            )}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px", marginBottom: "24px" }}>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Jina la Chanzo *</label>
+                <input name="name" value={form.name} onChange={handleChange} required placeholder="Mfano: Kisima cha Kati" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Aina ya Chanzo *</label>
+                <select name="source_type" value={form.source_type} onChange={handleChange} style={inputStyle}>
+                  <option value="shallow_well">Kisima cha Juu</option>
+                  <option value="deep_well">Kisima cha Kina</option>
+                  <option value="spring">Chemchem</option>
+                  <option value="river">Mto</option>
+                  <option value="dam">Bwawa</option>
+                  <option value="borehole">Bomba la Kuchimba</option>
+                  <option value="rainwater">Maji ya Mvua</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Hali ya Chanzo *</label>
+                <select name="status" value={form.status} onChange={handleChange} style={inputStyle}>
+                  <option value="safe">Salama</option>
+                  <option value="caution">Tahadhari</option>
+                  <option value="unsafe">Hatarini</option>
+                  <option value="under_repair">Inatengenezwa</option>
+                  <option value="dry">Kavu</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Kiwango cha pH</label>
+                <input name="ph_level" type="number" step="0.01" value={form.ph_level} onChange={handleChange} placeholder="Hiari (K.m. 7.2)" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Bakteria (cfu/100ml)</label>
+                <input name="bacteria_count" type="number" value={form.bacteria_count} onChange={handleChange} placeholder="Hiari (K.m. 0)" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Kiwango cha Chuma (mg/L)</label>
+                <input name="iron_level" type="number" step="0.01" value={form.iron_level} onChange={handleChange} placeholder="Hiari (K.m. 0.1)" style={inputStyle} />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button type="button" onClick={() => setShowForm(false)} style={{ padding: "0 24px", height: "42px", background: "transparent", border: "1px solid #3c3c3c", color: "#7e7e7e", fontSize: "12px", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "1px" }}>
+                Ghairi
+              </button>
+              <button type="submit" disabled={saving} style={{ padding: "0 32px", height: "42px", background: saving ? "#1a1a1a" : "#0066b1", border: "none", color: "#ffffff", fontSize: "12px", fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", textTransform: "uppercase", letterSpacing: "1px" }}>
+                {saving ? "Inahifadhi..." : "Ongeza Chanzo"}
+              </button>
+            </div>
+          </form>
+        )}
 
         {/* ─── SUMMARY STATS ─── */}
         <div

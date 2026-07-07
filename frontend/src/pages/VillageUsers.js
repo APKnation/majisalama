@@ -6,15 +6,7 @@ export default function VillageUsers() {
   const { user } = useAuth();
   const [users, setUsers]         = useState([]);
   const [loading, setLoading]     = useState(true);
-  const [showForm, setShowForm]   = useState(false);
-  const [saving, setSaving]       = useState(false);
-  const [error, setError]         = useState("");
-  const [success, setSuccess]     = useState("");
-  const [form, setForm]           = useState({
-    username: "", first_name: "", last_name: "",
-    email: "", phone: "", password: "", role: "citizen",
-    village_id: user?.village?.id || "",
-  });
+
 
   useEffect(() => { fetchUsers(); }, []);
 
@@ -27,21 +19,6 @@ export default function VillageUsers() {
     finally { setLoading(false); }
   };
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setSaving(true); setError(""); setSuccess("");
-    try {
-      await api.post("/users/", { ...form, village_id: user?.village?.id });
-      setSuccess("Mtumishi ameongezwa!");
-      setShowForm(false);
-      setForm({ username: "", first_name: "", last_name: "", email: "", phone: "", password: "", role: "citizen", village_id: user?.village?.id });
-      fetchUsers();
-    } catch (e) {
-      setError(e.response?.data?.username?.[0] || e.response?.data?.detail || "Hitilafu. Jaribu tena.");
-    } finally { setSaving(false); }
-  };
 
   const ROLE_COLORS = {
     citizen:        { color: "#7e7e7e", label: "Mwananchi" },
@@ -79,80 +56,8 @@ export default function VillageUsers() {
               Simamia watumiaji wa kijiji chako — wananchi na wafanyakazi.
             </p>
           </div>
-          <button
-            onClick={() => { setShowForm(!showForm); setError(""); setSuccess(""); }}
-            style={{
-              padding: "0 24px", height: "42px", background: showForm ? "transparent" : "#0066b1",
-              color: showForm ? "#7e7e7e" : "#ffffff", border: `1px solid ${showForm ? "#3c3c3c" : "#0066b1"}`,
-              fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase",
-              cursor: "pointer", transition: "all 0.15s",
-            }}
-          >
-            {showForm ? "✕ Ghairi" : "+ Ongeza Mtumishi"}
-          </button>
         </div>
 
-        {/* Success */}
-        {success && (
-          <div style={{ background: "#012010", border: "1px solid #0fa336", padding: "14px 20px", marginBottom: "20px", color: "#0fa336", fontSize: "13px" }}>
-            ✅ {success}
-          </div>
-        )}
-
-        {/* Add User Form */}
-        {showForm && (
-          <form onSubmit={handleSubmit} style={{ background: "#0d0d0d", border: "1px solid #3c3c3c", padding: "32px", marginBottom: "32px" }}>
-            <p style={{ color: "#ffffff", fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "24px" }}>
-              Mtumishi Mpya
-            </p>
-            {error && (
-              <div style={{ background: "#2d0808", border: "1px solid #e74c3c", padding: "12px 16px", marginBottom: "20px", color: "#e74c3c", fontSize: "13px" }}>
-                ⚠️ {error}
-              </div>
-            )}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px", marginBottom: "18px" }}>
-              <div>
-                <label style={labelStyle}>Jina la Kwanza</label>
-                <input name="first_name" value={form.first_name} onChange={handleChange} placeholder="Jina" style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Jina la Ukoo</label>
-                <input name="last_name" value={form.last_name} onChange={handleChange} placeholder="Ukoo" style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Jina la Mtumiaji *</label>
-                <input name="username" value={form.username} onChange={handleChange} required placeholder="username" style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Nywila *</label>
-                <input name="password" type="password" value={form.password} onChange={handleChange} required placeholder="Nywila" style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Barua Pepe</label>
-                <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="barua@mfano.com" style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Simu</label>
-                <input name="phone" value={form.phone} onChange={handleChange} placeholder="+255..." style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Jukumu</label>
-                <select name="role" value={form.role} onChange={handleChange} style={{ ...inputStyle, color: form.role !== "" ? "#ffffff" : "#7e7e7e" }}>
-                  <option value="citizen">Mwananchi</option>
-                  <option value="water_officer">Afisa wa Maji</option>
-                </select>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: "0 24px", height: "42px", background: "transparent", border: "1px solid #3c3c3c", color: "#7e7e7e", fontSize: "12px", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "1px" }}>
-                Ghairi
-              </button>
-              <button type="submit" disabled={saving} style={{ padding: "0 32px", height: "42px", background: saving ? "#1a1a1a" : "#0066b1", border: "none", color: "#ffffff", fontSize: "12px", fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", textTransform: "uppercase", letterSpacing: "1px" }}>
-                {saving ? "Inahifadhi..." : "Ongeza Mtumishi"}
-              </button>
-            </div>
-          </form>
-        )}
 
         {/* Users Table */}
         {loading ? (
@@ -162,7 +67,6 @@ export default function VillageUsers() {
         ) : users.length === 0 ? (
           <div style={{ border: "1px solid #3c3c3c", padding: "64px 32px", textAlign: "center" }}>
             <p style={{ color: "#7e7e7e", fontWeight: 300, marginBottom: "8px" }}>Hakuna watumishi walioorodheshwa.</p>
-            <p style={{ color: "#3c3c3c", fontSize: "12px" }}>Bonyeza "+ Ongeza Mtumishi" kuanza.</p>
           </div>
         ) : (
           <div style={{ border: "1px solid #3c3c3c", overflowX: "auto" }}>
