@@ -31,13 +31,10 @@ function StatusBadge({ status, label }) {
 function FeatureCard({ icon, title, desc }) {
   return (
     <div
-      style={{ background: "#1a1a1a", borderTop: "1px solid #3c3c3c" }}
-      className="p-7 hover:bg-[#262626] transition-colors duration-200"
+      style={{ background: "#1a1a1a", border: "1px solid #3c3c3c", minHeight: "220px", display: "flex", flexDirection: "column", justifyContent: "flex-start" }}
+      className="p-8 hover:bg-[#262626] transition-colors duration-200"
     >
-      <div
-        className="text-2xl mb-5"
-        style={{ color: "#0066b1" }}
-      >
+      <div className="text-2xl mb-5" style={{ color: "#0066b1" }}>
         {icon}
       </div>
       <h3 className="text-white font-bold text-[15px] uppercase tracking-[1px] mb-3">
@@ -53,16 +50,13 @@ function FeatureCard({ icon, title, desc }) {
 function StepCard({ num, title, desc }) {
   return (
     <div
-      style={{ background: "#1a1a1a", borderLeft: "2px solid #0066b1" }}
-      className="p-6 hover:bg-[#262626] transition-colors duration-200"
+      style={{ background: "#1a1a1a", borderLeft: "2px solid #0066b1", border: "1px solid #3c3c3c", borderLeftWidth: "2px", borderLeftColor: "#0066b1", minHeight: "200px", display: "flex", flexDirection: "column", justifyContent: "flex-start" }}
+      className="p-8 hover:bg-[#262626] transition-colors duration-200"
     >
-      <p
-        className="text-xs font-bold tracking-[2px] uppercase mb-3"
-        style={{ color: "#0066b1" }}
-      >
+      <p className="text-xs font-bold tracking-[2px] uppercase mb-3" style={{ color: "#0066b1" }}>
         {num}
       </p>
-      <h4 className="text-white font-bold text-sm uppercase tracking-[0.5px] mb-2">
+      <h4 className="text-white font-bold text-sm uppercase tracking-[0.5px] mb-3">
         {title}
       </h4>
       <p style={{ color: "#bbbbbb", fontWeight: 300 }} className="text-xs leading-relaxed">
@@ -94,54 +88,16 @@ export default function Home() {
       {/* ─── M TRICOLOR STRIPE ─── */}
       <div className="m-stripe" />
 
-      {/* ─── TOP NAV ─── */}
-      <nav
-        style={{ background: "#000000", borderBottom: "1px solid #3c3c3c" }}
-        className="sticky top-0 z-50"
-      >
-        <div className="max-w-[1440px] mx-auto px-8 flex items-center justify-between"
-          style={{ height: "64px" }}
-        >
-          <Link to="/" className="flex items-center gap-3 no-underline">
-            <div className="m-stripe" style={{ width: "32px", height: "3px" }} />
-            <span
-              className="text-white font-bold tracking-[2px] uppercase text-sm"
-            >
-              Maji Salama
-            </span>
-          </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            {[
-              { to: "/map", label: "Ramani" },
-              { to: "/report", label: "Ripoti" },
-              { to: "/alerts", label: "Arifa" },
-            ].map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                style={{ color: "#bbbbbb", letterSpacing: "0.5px", fontSize: "14px", fontWeight: 400 }}
-                className="hover:text-white transition-colors duration-150 no-underline"
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          <Link to="/login" className="btn-m-outline" style={{ padding: "10px 24px", height: "40px", fontSize: "13px" }}>
-            Ingia
-          </Link>
-        </div>
-      </nav>
 
       {/* ─── HERO BAND ─── */}
       <section
         style={{
           background: "#000000",
-          minHeight: "88vh",
+          minHeight: "100vh",
           display: "flex",
           alignItems: "center",
-          padding: "96px 0",
+          padding: "80px 0",
           position: "relative",
           overflow: "hidden",
         }}
@@ -160,23 +116,27 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: copy */}
             <div className="animate-fade-in-up">
-              <p
-                className="label-uppercase mb-6"
-                style={{ color: "#0066b1" }}
-              >
-                Mfumo wa Kisasa wa Maji · Tanzania
-              </p>
+             
 
               <h1 className="display-xl text-white mb-8" style={{ maxWidth: "600px" }}>
                 Maji Safi.<br />Jamii Salama.
               </h1>
 
               <p
-                className="body-md mb-10"
-                style={{ color: "#bbbbbb", maxWidth: "480px" }}
+                className="body-md mb-4"
+                style={{ color: "#bbbbbb", maxWidth: "520px", lineHeight: "1.8", fontSize: "17px" }}
               >
-                WaterTrack inakuwezesha kuona vyanzo vya maji, ripoti matatizo,
-                kufuatilia kazi za matengenezo na kutoa huduma salama kwa wananchi.
+                WaterTrack ni mfumo wa kisasa wa kufuatilia ubora na upatikanaji wa maji safi nchini Tanzania. 
+                Unakuwezesha kuona vyanzo vya maji, kuripoti uharibifu na upungufu wa maji haraka, 
+                na kufuatilia kazi za matengenezo kwa wakati halisi.
+              </p>
+              <p
+                className="body-md mb-10"
+                style={{ color: "#a0a0a0", maxWidth: "520px", lineHeight: "1.8", fontSize: "15px" }}
+              >
+                Wananchi, viongozi wa vijiji, wataalam wa maji na maafisa wa wilaya wanafanya kazi pamoja 
+                kwenye mfumo mmoja — kuhakikisha kila mwanajamii anapata maji salama, safi na ya kutosha 
+                kwa matumizi ya kila siku.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -191,7 +151,7 @@ export default function Home() {
 
             {/* Right: Image */}
             <div className="hidden lg:flex flex-col gap-8 animate-fade-in-up delay-200">
-              <div style={{ width: "100%", height: "400px", overflow: "hidden", border: "1px solid #3c3c3c", background: "#1a1a1a" }}>
+              <div style={{ width: "100%", height: "520px", overflow: "hidden", border: "1px solid #3c3c3c", background: "#1a1a1a" }}>
                 <img src="/kuchota%20maji.png" alt="Maji Salama" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "grayscale(20%) contrast(120%)" }} />
               </div>
             </div>
@@ -203,7 +163,7 @@ export default function Home() {
       <div className="m-stripe" />
 
       {/* ─── HOW IT WORKS ─── */}
-      <section style={{ background: "#0d0d0d", padding: "96px 0" }}>
+      <section style={{ background: "#0d0d0d", padding: "120px 0", minHeight: "60vh", display: "flex", alignItems: "center" }}>
         <div className="max-w-[1440px] mx-auto px-8">
           <div className="mb-16">
             <p className="label-uppercase mb-4" style={{ color: "#0066b1" }}>
@@ -221,8 +181,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px"
-            style={{ background: "#3c3c3c" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StepCard
               num="01"
               title="Ripoti bila kusubiri"
@@ -265,9 +224,9 @@ export default function Home() {
             <Link to="/map" className="btn-m-outline">Ona Ramani</Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "#3c3c3c" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentReports.length > 0 ? recentReports.map((r) => (
-              <div key={r.id} style={{ background: "#1a1a1a" }} className="p-8 hover:bg-[#262626] transition-colors duration-200 flex flex-col justify-between">
+              <div key={r.id} style={{ background: "#1a1a1a", border: "1px solid #3c3c3c", minHeight: "280px" }} className="p-8 hover:bg-[#262626] transition-colors duration-200 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4 gap-2">
                     <StatusBadge status={r.status} label={r.status_display} />
@@ -284,7 +243,7 @@ export default function Home() {
                 </div>
               </div>
             )) : (
-              <div style={{ background: "#1a1a1a", gridColumn: "1 / -1" }} className="p-12 text-center text-[#7e7e7e] font-light">
+              <div style={{ background: "#1a1a1a", border: "1px solid #3c3c3c", gridColumn: "1 / -1" }} className="p-12 text-center text-[#7e7e7e] font-light">
                 Hakuna ripoti zilizotumwa hivi karibuni.
               </div>
             )}
@@ -293,7 +252,7 @@ export default function Home() {
       </section>
 
       {/* ─── FEATURES GRID ─── */}
-      <section style={{ background: "#000000", padding: "96px 0" }}>
+      <section style={{ background: "#000000", padding: "120px 0", minHeight: "60vh", display: "flex", alignItems: "center" }}>
         <div className="max-w-[1440px] mx-auto px-8">
           <div className="mb-16">
             <p className="label-uppercase mb-4" style={{ color: "#0066b1" }}>
@@ -304,8 +263,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px"
-            style={{ background: "#3c3c3c" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <FeatureCard
               icon="👥"
               title="Huduma kwa Watumiaji Wote"
@@ -332,7 +290,11 @@ export default function Home() {
       <section
         style={{
           background: "#000000",
-          padding: "96px 0",
+          padding: "120px 0",
+          minHeight: "50vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           borderTop: "1px solid #3c3c3c",
         }}
         className="text-center"
