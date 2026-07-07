@@ -229,10 +229,15 @@ class DamageReportViewSet(viewsets.ModelViewSet):
     def assign(self, request, pk=None):
         """Ofisa wa Wilaya anapanga ripoti kwa mfanyakazi."""
         report = self.get_object()
-        if request.user.role not in ['district_officer', 'admin'] and not request.user.is_superuser:
-            return Response({'error': 'Ni Ofisa wa Wilaya tu anayeweza kupanga kazi.'}, status=status.HTTP_403_FORBIDDEN)
-        if report.status not in ['forwarded_to_district', 'assigned']:
-            return Response({'error': 'Ripoti lazima iwe na hali "forwarded_to_district" ili kupangwa.'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.role not in ['district_officer', 'village_leader', 'admin'] and not request.user.is_superuser:
+            return Response({'error': 'Hauna ruhusa ya kupanga kazi.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        if request.user.role == 'village_leader' and report.water_source.village != request.user.village:
+            return Response({'error': 'Unaweza tu kupanga kazi kwenye ripoti za kijiji chako.'}, status=status.HTTP_403_FORBIDDEN)
+
+        allowed_statuses = ['pending_village', 'village_approved', 'forwarded_to_district', 'assigned']
+        if report.status not in allowed_statuses:
+            return Response({'error': 'Hali ya ripoti hairuhusu kupangwa kwa sasa.'}, status=status.HTTP_400_BAD_REQUEST)
 
         worker_id = request.data.get('worker_id')
         try:

@@ -29,13 +29,26 @@ function StatusBadge({ status }) {
 
 export default function VillageReports() {
   const [reports, setReports]         = useState([]);
+  const [workers, setWorkers]         = useState([]);
   const [loading, setLoading]         = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
-  const [rejectModal, setRejectModal] = useState(null); // report object or null
+  const [rejectModal, setRejectModal] = useState(null);
   const [rejectReason, setRejectReason]   = useState("");
+  const [assignModal, setAssignModal] = useState(null);
+  const [assignWorkerId, setAssignWorkerId] = useState("");
   const [filter, setFilter]           = useState("all");
 
-  useEffect(() => { fetchReports(); }, []);
+  useEffect(() => { 
+    fetchReports();
+    fetchWorkers();
+  }, []);
+
+  const fetchWorkers = async () => {
+    try {
+      const res = await api.get("/users/?role=water_officer");
+      setWorkers(res.data.results || res.data);
+    } catch (err) { console.error(err); }
+  };
 
   const fetchReports = async () => {
     setLoading(true);
@@ -67,6 +80,23 @@ export default function VillageReports() {
     try {
       await api.post(`/damage-reports/${rejectModal.id}/village_reject/`, { reason: rejectReason });
       setRejectModal(null);
+      fetchReports();
+    } catch (e) {
+      alert(e.response?.data?.error || "Hitilafu imekutokea.");
+    } finally { setActionLoading(null); }
+  };
+
+  const openAssignModal = (report) => {
+    setAssignWorkerId("");
+    setAssignModal(report);
+  };
+
+  const handleAssign = async () => {
+    if (!assignModal || !assignWorkerId) return;
+    setActionLoading(assignModal.id + "_assign");
+    try {
+      await api.post(`/damage-reports/${assignModal.id}/assign/`, { worker_id: assignWorkerId });
+      setAssignModal(null);
       fetchReports();
     } catch (e) {
       alert(e.response?.data?.error || "Hitilafu imekutokea.");
@@ -201,32 +231,50 @@ export default function VillageReports() {
                   </div>
 
                   {/* Action Buttons */}
-                  {r.status === "pending_village" && (
-                    <div style={{ display: "flex", gap: "10px", flexShrink: 0 }}>
+                  {['pending_village', 'village_approved', 'forwarded_to_district', 'assigned'].includes(r.status) && (
+                    <div style={{ display: "flex", gap: "10px", flexShrink: 0, flexWrap: "wrap" }}>
+                      {r.status === "pending_village" && (
+                        <>
+                          <button
+                            onClick={() => handleApprove(r)}
+                            disabled={actionLoading === r.id + "_approve"}
+                            style={{
+                              padding: "0 20px", height: "38px", fontSize: "11px", fontWeight: 700,
+                              letterSpacing: "1px", textTransform: "uppercase",
+                              background: "#0fa336", color: "#ffffff", border: "none",
+                              cursor: "pointer", opacity: actionLoading === r.id + "_approve" ? 0.6 : 1,
+                              transition: "opacity 0.15s",
+                            }}
+                          >
+                            {actionLoading === r.id + "_approve" ? "..." : "✓ Idhibitia"}
+                          </button>
+                          <button
+                            onClick={() => openRejectModal(r)}
+                            style={{
+                              padding: "0 20px", height: "38px", fontSize: "11px", fontWeight: 700,
+                              letterSpacing: "1px", textTransform: "uppercase",
+                              background: "transparent", color: "#e74c3c",
+                              border: "1px solid #e74c3c44",
+                              cursor: "pointer", transition: "all 0.15s",
+                            }}
+                          >
+                            ✕ Kataa
+                          </button>
+                        </>
+                      )}
+                      
                       <button
-                        onClick={() => handleApprove(r)}
-                        disabled={actionLoading === r.id + "_approve"}
+                        onClick={() => openAssignModal(r)}
+                        disabled={actionLoading === r.id + "_assign"}
                         style={{
                           padding: "0 20px", height: "38px", fontSize: "11px", fontWeight: 700,
                           letterSpacing: "1px", textTransform: "uppercase",
-                          background: "#0fa336", color: "#ffffff", border: "none",
-                          cursor: "pointer", opacity: actionLoading === r.id + "_approve" ? 0.6 : 1,
+                          background: "#1c69d4", color: "#ffffff", border: "none",
+                          cursor: "pointer", opacity: actionLoading === r.id + "_assign" ? 0.6 : 1,
                           transition: "opacity 0.15s",
                         }}
                       >
-                        {actionLoading === r.id + "_approve" ? "..." : "✓ Idhibitia"}
-                      </button>
-                      <button
-                        onClick={() => openRejectModal(r)}
-                        style={{
-                          padding: "0 20px", height: "38px", fontSize: "11px", fontWeight: 700,
-                          letterSpacing: "1px", textTransform: "uppercase",
-                          background: "transparent", color: "#e74c3c",
-                          border: "1px solid #e74c3c44",
-                          cursor: "pointer", transition: "all 0.15s",
-                        }}
-                      >
-                        ✕ Kataa
+                        {actionLoading === r.id + "_assign" ? "..." : (r.status === "assigned" ? "↩ Badili Mfanyakazi" : "🔧 Panga Mfanyakazi")}
                       </button>
                     </div>
                   )}
@@ -294,6 +342,72 @@ export default function VillageReports() {
                 }}
               >
                 {actionLoading === rejectModal.id + "_reject" ? "Inatuma..." : "Kataa Ripoti"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Modal */}
+      {assignModal && (
+        <div style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 1000, padding: "20px",
+        }}>
+          <div style={{ background: "#0d0d0d", border: "1px solid #3c3c3c", padding: "40px", maxWidth: "500px", width: "100%" }}>
+            <p style={{ color: "#1c69d4", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>
+              Panga Kazi
+            </p>
+            <h2 style={{ color: "#ffffff", fontSize: "20px", fontWeight: 700, marginBottom: "8px" }}>
+              {assignModal.title}
+            </h2>
+            <p style={{ color: "#7e7e7e", fontSize: "13px", fontWeight: 300, marginBottom: "24px" }}>
+              Chagua Afisa wa Maji atakayeshughulikia tatizo hili moja kwa moja.
+            </p>
+            <div style={{ marginBottom: "24px" }}>
+              <label style={{ display: "block", color: "#7e7e7e", fontSize: "10px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>
+                Mfanyakazi
+              </label>
+              <select
+                value={assignWorkerId}
+                onChange={e => setAssignWorkerId(e.target.value)}
+                style={{
+                  width: "100%", padding: "12px", background: "#1a1a1a",
+                  border: "1px solid #3c3c3c", color: "#ffffff", fontSize: "14px",
+                  outline: "none", boxSizing: "border-box",
+                }}
+              >
+                <option value="">— Chagua —</option>
+                {workers.map(w => (
+                  <option key={w.id} value={w.id}>{w.username} ({w.first_name || "Maji"} {w.last_name || "Afisa"})</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button
+                onClick={() => setAssignModal(null)}
+                style={{
+                  flex: 1, height: "42px", background: "transparent",
+                  border: "1px solid #3c3c3c", color: "#7e7e7e",
+                  fontSize: "12px", fontWeight: 700, cursor: "pointer",
+                  textTransform: "uppercase", letterSpacing: "1px",
+                }}
+              >
+                Ghairi
+              </button>
+              <button
+                onClick={handleAssign}
+                disabled={!assignWorkerId || actionLoading === assignModal.id + "_assign"}
+                style={{
+                  flex: 1, height: "42px", background: "#1c69d4",
+                  border: "none", color: "#ffffff",
+                  fontSize: "12px", fontWeight: 700, cursor: "pointer",
+                  textTransform: "uppercase", letterSpacing: "1px",
+                  opacity: (!assignWorkerId || actionLoading === assignModal.id + "_assign") ? 0.6 : 1,
+                }}
+              >
+                {actionLoading === assignModal.id + "_assign" ? "Inatuma..." : "Panga Kazi"}
               </button>
             </div>
           </div>
