@@ -7,7 +7,7 @@ function StatusBadge({ status, label }) {
   const map = {
     safe:         { color: "#0fa336", bg: "#012010" },
     caution:      { color: "#f4b400", bg: "#2a2200" },
-    unsafe:       { color: "#e22718", bg: "#2e0800" },
+    unsafe:       { color: "#ffffff", bg: "#2e0800" },
     under_repair: { color: "#1c69d4", bg: "#001a3e" },
     dry:          { color: "#7e7e7e", bg: "#1a1a1a" },
   };

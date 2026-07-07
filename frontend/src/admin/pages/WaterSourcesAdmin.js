@@ -6,7 +6,7 @@ function StatusBadge({ status, label }) {
   const map = {
     safe:         { color: "#0fa336", bg: "#012010" },
     caution:      { color: "#f4b400", bg: "#2a2200" },
-    unsafe:       { color: "#e22718", bg: "#2e0800" },
+    unsafe:       { color: "#ffffff", bg: "#2e0800" },
     under_repair: { color: "#1c69d4", bg: "#001a3e" },
     dry:          { color: "#7e7e7e", bg: "#1a1a1a" },
   };
@@ -128,7 +128,7 @@ export default function WaterSourcesAdmin() {
                   <td style={{ padding: "16px 20px" }}>
                     <div style={{ display: "flex", gap: "12px" }}>
                       <button onClick={() => openEditModal(s)} style={{ color: "#0066b1", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Hariri</button>
-                      <button onClick={() => handleDelete(s.id)} style={{ color: "#e22718", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Futa</button>
+                      <button onClick={() => handleDelete(s.id)} style={{ color: "#ffffff", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Futa</button>
                     </div>
                   </td>
                 </tr>

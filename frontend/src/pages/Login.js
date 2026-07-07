@@ -113,10 +113,10 @@ export default function Login() {
 
             {error && (
               <div
-                style={{ background: "#1a1a1a", borderLeft: "2px solid #e22718" }}
+                style={{ background: "#1a1a1a", borderLeft: "2px solid #ffffff" }}
                 className="flex items-center gap-3 px-4 py-3 mb-6"
               >
-                <span style={{ color: "#e22718" }}>⚠</span>
+                <span style={{ color: "#ffffff" }}>⚠</span>
                 <p className="body-sm" style={{ color: "#bbbbbb" }}>{error}</p>
               </div>
             )}

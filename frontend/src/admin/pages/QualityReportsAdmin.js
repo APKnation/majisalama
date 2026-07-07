@@ -5,7 +5,7 @@ import { getAllQualityReports, getAllWaterSources, createQualityReport } from ".
 function StatusBadge({ status, label }) {
   const map = {
     true:  { color: "#0fa336", bg: "#012010" },
-    false: { color: "#e22718", bg: "#2e0800" },
+    false: { color: "#ffffff", bg: "#2e0800" },
   };
   const s = map[String(status)] || { color: "#7e7e7e", bg: "#1a1a1a" };
   return (

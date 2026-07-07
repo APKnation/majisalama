@@ -14,7 +14,7 @@ function StatusBadge({ status }) {
     resolved:    { label: "Imetatuliwa", color: "#0fa336", bg: "#012010" },
     closed:      { label: "Imefungwa",   color: "#7e7e7e", bg: "#1a1a1a" },
     safe:        { label: "Salama",      color: "#0fa336", bg: "#012010" },
-    unsafe:      { label: "Hatarini",    color: "#e22718", bg: "#2e0800" },
+    unsafe:      { label: "Hatarini",    color: "#ffffff", bg: "#2e0800" },
     caution:     { label: "Tahadhari",   color: "#f4b400", bg: "#2a2200" },
   };
   const s = map[status] || { label: status, color: "#7e7e7e", bg: "#1a1a1a" };
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
           <StatCard title="Jumla ya Vyanzo"  value={stats.totalSources}   accent="#0066b1" loading={loading} />
           <StatCard title="Vyanzo Salama"    value={stats.safeSources}    accent="#0fa336" loading={loading} sub={`${stats.totalSources > 0 ? Math.round((stats.safeSources / stats.totalSources) * 100) : 0}% ya jumla`} />
           <StatCard title="Tahadhari"        value={stats.cautionSources} accent="#f4b400" loading={loading} />
-          <StatCard title="Hatarini"         value={stats.unsafeSources}  accent="#e22718" loading={loading} />
+          <StatCard title="Hatarini"         value={stats.unsafeSources}  accent="#ffffff" loading={loading} />
         </div>
       </section>
 
@@ -293,7 +293,7 @@ export default function AdminDashboard() {
           <div className="divide-y" style={{ borderColor: "#1a1a1a" }}>
             {[
               { to: "/admin/water-sources", abbr: "VS", title: "Vyanzo vya Maji",    desc: "Simamia vyanzo vyote",           accent: "#0066b1" },
-              { to: "/admin/reports",       abbr: "RP", title: "Ripoti za Uharibifu", desc: "Angalia na gawa kazi",           accent: "#e22718" },
+              { to: "/admin/reports",       abbr: "RP", title: "Ripoti za Uharibifu", desc: "Angalia na gawa kazi",           accent: "#ffffff" },
               { to: "/admin/quality",       abbr: "QR", title: "Ripoti za Ubora",    desc: "Rekodi upimaji wa maji",         accent: "#0fa336" },
               { to: "/admin/users",         abbr: "WA", title: "Watumiaji",           desc: "Simamia akaunti za watumiaji",   accent: "#1c69d4" },
               { to: "/admin/alerts",        abbr: "AR", title: "Arifa",               desc: "Tuma arifa kwa wananchi",        accent: "#f4b400" },

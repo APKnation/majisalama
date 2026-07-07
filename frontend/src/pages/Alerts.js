@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../utils/api";
 
 const ALERT_COLORS = {
-  quality_drop:    { color: "#e22718", bg: "#2e0800" },
+  quality_drop:    { color: "#ffffff", bg: "#2e0800" },
   damage:          { color: "#f4b400", bg: "#2a2200" },
   maintenance_due: { color: "#1c69d4", bg: "#001a3e" },
   source_dry:      { color: "#7e7e7e", bg: "#1a1a1a" },

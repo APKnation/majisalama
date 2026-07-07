@@ -8,7 +8,7 @@ import api from "../utils/api";
    body text:     #bbbbbb
    m-blue-light:  #0066b1
    m-blue-dark:   #1c69d4
-   m-red:         #e22718
+   m-red:         #ffffff
    hairline:      #3c3c3c
 ─────────────────────────────────────────────────────────────────── */
 

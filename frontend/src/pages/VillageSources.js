@@ -7,7 +7,7 @@ function StatusBadge({ status, label }) {
   const map = {
     safe:        { color: "#0fa336", bg: "#012010" },
     caution:     { color: "#f4b400", bg: "#2a2200" },
-    unsafe:      { color: "#e22718", bg: "#2e0800" },
+    unsafe:      { color: "#ffffff", bg: "#2e0800" },
     under_repair:{ color: "#1c69d4", bg: "#001a3e" },
     dry:         { color: "#7e7e7e", bg: "#1a1a1a" },
   };
@@ -308,7 +308,7 @@ export default function VillageSources() {
             { label: "Jumla",     value: sources.length,                                            accent: "#0066b1" },
             { label: "Salama",    value: sources.filter((s) => s.status === "safe").length,         accent: "#0fa336" },
             { label: "Tahadhari", value: sources.filter((s) => s.status === "caution").length,      accent: "#f4b400" },
-            { label: "Hatarini",  value: sources.filter((s) => s.status === "unsafe").length,       accent: "#e22718" },
+            { label: "Hatarini",  value: sources.filter((s) => s.status === "unsafe").length,       accent: "#ffffff" },
           ].map(({ label, value, accent }) => (
             <div
               key={label}
@@ -337,7 +337,7 @@ export default function VillageSources() {
               Hakuna vyanzo vya maji vilivyoorodheshwa kwa kijiji chako.
             </p>
             {!user?.village && (
-              <p style={{ color: "#e22718", fontSize: "12px", fontWeight: 300 }}>
+              <p style={{ color: "#ffffff", fontSize: "12px", fontWeight: 300 }}>
                 Akaunti yako haihusiani na kijiji chochote.
               </p>
             )}
@@ -387,7 +387,7 @@ export default function VillageSources() {
                           position: "absolute",
                           height: "2px",
                           width: `${Math.min(100, (parseFloat(source.ph_level) / 14) * 100)}%`,
-                          background: parseFloat(source.ph_level) >= 6.5 && parseFloat(source.ph_level) <= 8.5 ? "#0fa336" : "#e22718",
+                          background: parseFloat(source.ph_level) >= 6.5 && parseFloat(source.ph_level) <= 8.5 ? "#0fa336" : "#ffffff",
                         }}
                       />
                     </div>

@@ -6,7 +6,7 @@ function StatusBadge({ status, label }) {
   const map = {
     safe:         { color: "#0fa336", bg: "#012010" },
     caution:      { color: "#f4b400", bg: "#2a2200" },
-    unsafe:       { color: "#e22718", bg: "#2e0800" },
+    unsafe:       { color: "#ffffff", bg: "#2e0800" },
     under_repair: { color: "#1c69d4", bg: "#001a3e" },
     dry:          { color: "#7e7e7e", bg: "#1a1a1a" },
   };
@@ -89,7 +89,7 @@ export default function WaterSourceDetail() {
             </div>
 
             <div style={{ display: "flex", gap: "16px", borderTop: "1px solid #1a1a1a", paddingTop: "32px" }}>
-              <Link to="/report" style={{ display: "inline-block", background: "transparent", color: "#e22718", border: "1px solid #e22718", padding: "12px 24px", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", textDecoration: "none", transition: "background 0.2s" }}
+              <Link to="/report" style={{ display: "inline-block", background: "transparent", color: "#ffffff", border: "1px solid #ffffff", padding: "12px 24px", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", textDecoration: "none", transition: "background 0.2s" }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "#2e0800" }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
               >
                 Ripoti Uharibifu

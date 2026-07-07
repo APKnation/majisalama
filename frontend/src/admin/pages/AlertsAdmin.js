@@ -12,8 +12,8 @@ const ALERT_TYPES = [
 
 function StatusBadge({ type, label }) {
   const map = {
-    quality_drop:     { color: "#e22718", bg: "#2e0800" },
-    source_dry:       { color: "#e22718", bg: "#2e0800" },
+    quality_drop:     { color: "#ffffff", bg: "#2e0800" },
+    source_dry:       { color: "#ffffff", bg: "#2e0800" },
     damage:           { color: "#f4b400", bg: "#2a2200" },
     maintenance_due:  { color: "#1c69d4", bg: "#001a3e" },
     general:          { color: "#0fa336", bg: "#012010" },
@@ -128,7 +128,7 @@ export default function AlertsAdmin() {
                   <td style={{ padding: "16px 20px" }}>
                     <div style={{ display: "flex", gap: "12px" }}>
                       <button onClick={() => handleOpenModal(a)} style={{ color: "#0066b1", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Badili</button>
-                      <button onClick={() => handleDelete(a.id)} style={{ color: "#e22718", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Futa</button>
+                      <button onClick={() => handleDelete(a.id)} style={{ color: "#ffffff", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Futa</button>
                     </div>
                   </td>
                 </tr>

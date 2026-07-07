@@ -12,7 +12,7 @@ function StatusBadge({ status }) {
     resolved:    { label: "Imetatuliwa",color: "#0fa336", bg: "#012010" },
     closed:      { label: "Imefungwa",  color: "#7e7e7e", bg: "#1a1a1a" },
     safe:        { label: "Salama",     color: "#0fa336", bg: "#012010" },
-    unsafe:      { label: "Hatarini",   color: "#e22718", bg: "#2e0800" },
+    unsafe:      { label: "Hatarini",   color: "#ffffff", bg: "#2e0800" },
     caution:     { label: "Tahadhari",  color: "#f4b400", bg: "#2a2200" },
   };
   const s = map[status] || { label: status, color: "#7e7e7e", bg: "#1a1a1a" };
@@ -136,7 +136,7 @@ function RoleActions({ role }) {
       { to: "/messages",  abbr: "UJ", title: "Soma Ujumbe",       desc: "Wasiliana na viongozi wa vijiji",     accent: "#0066b1" },
     ],
     citizen: [
-      { to: "/reports/new",    abbr: "RU", title: "Ripoti Uharibifu",    desc: "Ripoti tatizo kwenye chanzo",    accent: "#e22718" },
+      { to: "/reports/new",    abbr: "RU", title: "Ripoti Uharibifu",    desc: "Ripoti tatizo kwenye chanzo",    accent: "#ffffff" },
       { to: "/water-sources",  abbr: "VK", title: "Vyanzo Vya Karibu",   desc: "Tafuta vyanzo salama karibu nawe", accent: "#0066b1" },
       { to: "/messages",       abbr: "UJ", title: "Soma Ujumbe",         desc: "Wasiliana na kiongozi wako",     accent: "#1c69d4" },
     ],
@@ -250,7 +250,7 @@ export default function Dashboard() {
           >
             <StatCard title="Jumla ya Vyanzo"  value={stats.totalSources}   accent="#0066b1" loading={loading} />
             <StatCard title="Vyanzo Salama"     value={stats.safeSources}    accent="#0fa336" loading={loading} />
-            <StatCard title="Vyanzo Hatarini"   value={stats.unsafeSources}  accent="#e22718" loading={loading} />
+            <StatCard title="Vyanzo Hatarini"   value={stats.unsafeSources}  accent="#ffffff" loading={loading} />
             <StatCard title="Ripoti (Subiri)"   value={stats.pendingReports} accent="#f4b400" loading={loading} />
           </div>
         </section>

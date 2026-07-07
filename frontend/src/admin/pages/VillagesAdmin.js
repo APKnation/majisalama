@@ -97,7 +97,7 @@ export default function VillagesAdmin() {
                   <td style={{ padding: "16px 20px" }}>
                     <div style={{ display: "flex", gap: "12px" }}>
                       <button onClick={() => openEditModal(v)} style={{ color: "#0066b1", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Hariri</button>
-                      <button onClick={() => handleDelete(v.id)} style={{ color: "#e22718", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Futa</button>
+                      <button onClick={() => handleDelete(v.id)} style={{ color: "#ffffff", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>Futa</button>
                     </div>
                   </td>
                 </tr>

@@ -36,7 +36,7 @@ export default function Navbar() {
               )}
               <Link to="/report" className="btn-m-primary" style={{ height: "36px", padding: "0 16px", fontSize: "11px" }}>Ripoti</Link>
               <span style={{ color: "#7e7e7e", fontSize: "13px", fontWeight: 300 }}>{user.username}</span>
-              <button onClick={logout} style={{ color: "#e22718", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>
+              <button onClick={logout} style={{ color: "#ffffff", fontSize: "11px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "transparent", cursor: "pointer" }}>
                 Toka
               </button>
             </div>
@@ -74,7 +74,7 @@ export default function Navbar() {
             <>
               {isAdmin?.() && <Link to="/admin" onClick={() => setMobileOpen(false)} style={{ display: "block", color: "#0066b1", fontSize: "13px", padding: "10px 0", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}>Admin Panel</Link>}
               <Link to="/report" onClick={() => setMobileOpen(false)} style={{ display: "block", color: "#ffffff", fontSize: "13px", padding: "10px 0", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}>Ripoti Uharibifu</Link>
-              <button onClick={() => { logout(); setMobileOpen(false); }} style={{ display: "block", color: "#e22718", fontSize: "13px", padding: "10px 0", background: "transparent", cursor: "pointer", width: "100%", textAlign: "left" }}>Toka</button>
+              <button onClick={() => { logout(); setMobileOpen(false); }} style={{ display: "block", color: "#ffffff", fontSize: "13px", padding: "10px 0", background: "transparent", cursor: "pointer", width: "100%", textAlign: "left" }}>Toka</button>
             </>
           ) : (
             <>
