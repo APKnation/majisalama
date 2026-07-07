@@ -64,6 +64,7 @@ function SpecRow({ label, value }) {
 export default function VillageSources() {
   const { user } = useAuth();
   const [sources, setSources] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState("grid"); // "grid" | "table"
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
