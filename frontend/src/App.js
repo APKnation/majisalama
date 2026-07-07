@@ -36,6 +36,7 @@ import WaterOfficerDashboard from "./pages/WaterOfficerDashboard";
 import WaterOfficerReports from "./pages/WaterOfficerReports";
 import WaterOfficerSources from "./pages/WaterOfficerSources";
 import DistrictDashboard from "./pages/DistrictDashboard";
+import DistrictReports from "./pages/DistrictReports";
 
 // Admin imports
 import AdminDashboard from "./admin/pages/AdminDashboard";
@@ -340,11 +341,51 @@ function App() {
             }
           />
           <Route
+            path="/water-officer-messages"
+            element={
+              <RoleRoute allowedRoles={["water_officer"]}>
+                <WaterOfficerLayout>
+                  <Messages />
+                </WaterOfficerLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
             path="/district-dashboard"
             element={
               <RoleRoute allowedRoles={["district_officer"]}>
                 <DistrictOfficerLayout>
                   <DistrictDashboard />
+                </DistrictOfficerLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/district-reports"
+            element={
+              <RoleRoute allowedRoles={["district_officer"]}>
+                <DistrictOfficerLayout>
+                  <DistrictReports />
+                </DistrictOfficerLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/district-assign"
+            element={
+              <RoleRoute allowedRoles={["district_officer"]}>
+                <DistrictOfficerLayout>
+                  <AssignTasks />
+                </DistrictOfficerLayout>
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/district-messages"
+            element={
+              <RoleRoute allowedRoles={["district_officer"]}>
+                <DistrictOfficerLayout>
+                  <Messages />
                 </DistrictOfficerLayout>
               </RoleRoute>
             }

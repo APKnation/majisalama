@@ -31,7 +31,7 @@ export default function AssignTasks() {
 
   const fetchReports = async () => {
     try {
-      const response = await api.get("/damage-reports/?status=pending");
+      const response = await api.get("/damage-reports/?status=forwarded_to_district");
       setReports(response.data.results || response.data);
     } catch (error) {
       console.error("Error fetching reports:", error);

@@ -16,17 +16,28 @@ function StatCard({ label, value, accent }) {
 
 export default function DistrictDashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ totalVillages: 0, totalSources: 0, safeSources: 0, pendingReports: 0 });
+  const [stats, setStats] = useState({ totalVillages: 0, totalSources: 0, safeSources: 0, pendingAssign: 0, inProgress: 0, resolved: 0 });
 
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
-      const [sRes, rRes, vRes] = await Promise.all([api.get("/water-sources/"), api.get("/damage-reports/"), api.get("/villages/")]);
+      const [sRes, rRes, vRes] = await Promise.all([
+        api.get("/water-sources/"),
+        api.get("/damage-reports/"),
+        api.get("/villages/"),
+      ]);
       const s = sRes.data.results || sRes.data;
       const r = rRes.data.results || rRes.data;
       const v = vRes.data.results || vRes.data;
-      setStats({ totalVillages: v.length, totalSources: s.length, safeSources: s.filter(x => x.status === "safe").length, pendingReports: r.filter(x => x.status === "pending").length });
+      setStats({
+        totalVillages:   v.length,
+        totalSources:    s.length,
+        safeSources:     s.filter(x => x.status === "safe").length,
+        pendingAssign:   r.filter(x => x.status === "forwarded_to_district").length,
+        inProgress:      r.filter(x => x.status === "in_progress").length,
+        resolved:        r.filter(x => x.status === "resolved").length,
+      });
     } catch (e) { console.error(e); }
   };
 
@@ -42,11 +53,15 @@ export default function DistrictDashboard() {
         </h1>
         <p style={{ color: "#bbbbbb", fontSize: "14px", fontWeight: 300, marginBottom: "40px" }}>Muhtasari wa hali ya wilaya nzima.</p>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "#3c3c3c" }}>
-          <StatCard label="Vijiji"              value={stats.totalVillages}  accent="#0066b1" />
-          <StatCard label="Vyanzo vya Maji"     value={stats.totalSources}   accent="#1c69d4" />
-          <StatCard label="Salama"              value={stats.safeSources}    accent="#0fa336" />
-          <StatCard label="Ripoti Zinazosubiri" value={stats.pendingReports} accent="#f4b400" />
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "#3c3c3c", marginBottom: "24px" }}>
+          <StatCard label="Vijiji"              value={stats.totalVillages} accent="#0066b1" />
+          <StatCard label="Vyanzo vya Maji"     value={stats.totalSources}  accent="#1c69d4" />
+          <StatCard label="Salama"              value={stats.safeSources}   accent="#0fa336" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-px" style={{ background: "#3c3c3c" }}>
+          <StatCard label="🔔 Zinasubiri Kupangwa" value={stats.pendingAssign} accent="#9b59b6" />
+          <StatCard label="🔧 Zinafanyiwa Kazi"     value={stats.inProgress}   accent="#f4b400" />
+          <StatCard label="✅ Zimetatuliwa"          value={stats.resolved}     accent="#0fa336" />
         </div>
       </div>
     </div>
