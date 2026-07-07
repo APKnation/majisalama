@@ -60,7 +60,7 @@ export default function AssignTasks() {
       fetchReports();
     } catch (error) {
       console.error("Error assigning report:", error);
-      alert("Kuna hitilafu wakati wa kugawa ripoti.");
+      alert(error.response?.data?.error || "Kuna hitilafu wakati wa kugawa ripoti.");
     } finally {
       setLoading(false);
     }
