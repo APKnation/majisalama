@@ -1,0 +1,12 @@
+{
+  "build": {
+    "command": "npm run build",
+    "env": {
+      "NODE_OPTIONS": "--max-old-space-size=512",
+      "CI": "false"
+    }
+  },
+  "deploy": {
+    "startCommand": "serve -s build -l $PORT"
+  }
+}

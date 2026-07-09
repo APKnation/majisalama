@@ -12,7 +12,11 @@ DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
     'localhost,127.0.0.1'
-).split(',') + ['.up.railway.app', '.railway.app']
+).split(',') + ['.up.railway.app', '.railway.app', '.railway.internal']
+
+# On Railway, accept all hosts (healthchecks hit the internal *.railway.internal host)
+if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_SERVICE_ID'):
+    ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
