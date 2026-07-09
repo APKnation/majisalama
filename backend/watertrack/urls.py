@@ -19,6 +19,7 @@ router.register(r'messages', MessageViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/predict-demand/', predict_water_demand, name='predict-demand'),
     path('api/auth/login/', custom_login, name='custom-login'),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),

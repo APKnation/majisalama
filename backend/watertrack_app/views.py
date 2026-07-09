@@ -9,6 +9,9 @@ from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from django.db.models import Q
+from django.conf import settings
+import os
+import joblib
 from .models import *
 from .serializers import *
 
@@ -409,3 +412,64 @@ def custom_login(request):
             'is_superuser': user.is_superuser,
         }
     })
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def predict_water_demand(request):
+    try:
+        from datetime import datetime
+        
+        data = request.data
+        temperature = float(data.get('temperature', 0))
+        rainfall = float(data.get('rainfall', 0))
+        humidity = float(data.get('humidity', 65.0))
+        population = float(data.get('population', 0))
+        water_level = float(data.get('water_level', 0))
+        ph = float(data.get('pH', 7.5))
+        turbidity = float(data.get('turbidity', 2.7))
+        flow_rate = float(data.get('flow_rate', 55.0))
+        district = data.get('district', 'Ilala')
+        
+        current_month = datetime.now().strftime('%b')
+        month = data.get('month', current_month)
+        
+        model_path = os.path.join(settings.BASE_DIR, 'water_model.pkl')
+        if not os.path.exists(model_path):
+            return Response({'error': 'Model not found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        model = joblib.load(model_path)
+        
+        # Predict expects a DataFrame for the ColumnTransformer
+        import pandas as pd
+        input_data = pd.DataFrame([{
+            'temperature': temperature,
+            'rainfall': rainfall,
+            'humidity': humidity,
+            'population': population,
+            'water_level': water_level,
+            'pH': ph,
+            'turbidity': turbidity,
+            'flow_rate': flow_rate,
+            'district': district,
+            'month': month
+        }])
+        
+        prediction = model.predict(input_data)
+        
+        return Response({
+            'predicted_demand': prediction[0],
+            'inputs': {
+                'temperature': temperature,
+                'rainfall': rainfall,
+                'humidity': humidity,
+                'population': population,
+                'water_level': water_level,
+                'pH': ph,
+                'turbidity': turbidity,
+                'flow_rate': flow_rate,
+                'district': district,
+                'month': month
+            }
+        })
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

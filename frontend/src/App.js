@@ -46,6 +46,8 @@ import VillagesAdmin from "./admin/pages/VillagesAdmin";
 import DamageReportsAdmin from "./admin/pages/DamageReportsAdmin";
 import QualityReportsAdmin from "./admin/pages/QualityReportsAdmin";
 import AlertsAdmin from "./admin/pages/AlertsAdmin";
+import ChatbotPredictor from "./pages/ChatbotPredictor";
+import FloatingChatButton from "./components/FloatingChatButton";
 
 // ✅ Protected Admin Route Component
 const AdminRoute = ({ children }) => {
@@ -124,6 +126,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <FloatingChatButton />
         <Routes>
           {/* Public Routes */}
           <Route
@@ -133,6 +136,18 @@ function App() {
                 <>
                   <Navbar />
                   <Home />
+                  <Footer />
+                </>
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/predict"
+            element={
+              <PublicRoute>
+                <>
+                  <Navbar />
+                  <ChatbotPredictor />
                   <Footer />
                 </>
               </PublicRoute>
