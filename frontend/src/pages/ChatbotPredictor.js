@@ -10,6 +10,7 @@ const ChatbotPredictor = () => {
   const [step, setStep] = useState(0); 
   const [inputs, setInputs] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [predictionResult, setPredictionResult] = useState(null);
   const messagesEndRef = useRef(null);
 
   // The 'question' string here is what the bot asks AFTER this key is answered, to get the NEXT key.
@@ -70,9 +71,9 @@ const ChatbotPredictor = () => {
         const prediction = response.data.predicted_demand;
         setTimeout(() => {
           setIsLoading(false);
+          setPredictionResult({ value: Math.round(prediction), inputs: newInputs });
           setMessages(prev => [...prev, { 
             id: Date.now()+3, 
-            text: `Kulingana na taarifa ulizotoa, mahitaji ya maji yanatarajiwa kuwa **${Math.round(prediction).toLocaleString()}** lita/siku.`, 
             sender: 'bot',
             isPrediction: true
           }]);
@@ -91,11 +92,12 @@ const ChatbotPredictor = () => {
 
   const resetChat = () => {
     setMessages([
-      { id: 1, text: "Habari! Mimi ni Msaidizi wako wa AI wa Maji. Nitakusaidia kutabiri mahitaji ya maji katika eneo lako.", sender: 'bot' },
+      { id: 1, text: "Habari! Nitakusaidia kutabiri mahitaji ya maji katika eneo lako.", sender: 'bot' },
       { id: 2, text: "Je, ni joto gani sasa hivi (°C)?", sender: 'bot' }
     ]);
     setStep(0);
     setInputs({});
+    setPredictionResult(null);
   };
 
   const isNumericInput = step < steps.length && steps[step].type === 'number';
@@ -124,17 +126,77 @@ const ChatbotPredictor = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-[#121212] to-[#181818]">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] p-4 rounded-2xl ${
-                msg.sender === 'user' 
-                  ? 'bg-blue-600 text-white rounded-br-none' 
-                  : msg.isPrediction 
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+              {msg.isPrediction && predictionResult ? (
+                /* ── Rich Prediction Card ── */
+                <div style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',
+                  border: '1px solid rgba(99,199,255,0.25)',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  boxShadow: '0 0 30px rgba(0,150,255,0.15)',
+                  animation: 'fadeSlideUp 0.5s ease',
+                }}>
+                  {/* Card Header */}
+                  <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'16px' }}>
+                    <div style={{ width:40, height:40, borderRadius:'50%', background:'linear-gradient(135deg,#00c6ff,#0072ff)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C12 2 4 10.5 4 15a8 8 0 0016 0C20 10.5 12 2 12 2z"/></svg>
+                    </div>
+                    <div>
+                      <p style={{ color:'#aad4ff', fontSize:'11px', fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', margin:0 }}>Matokeo ya Utabiri</p>
+                      <p style={{ color:'rgba(255,255,255,0.4)', fontSize:'10px', margin:0 }}>Inayotolewa na Muundo wa AI</p>
+                    </div>
+                  </div>
+
+                  {/* Big Number */}
+                  <div style={{ textAlign:'center', margin:'16px 0 20px' }}>
+                    <p style={{ color:'rgba(170,212,255,0.7)', fontSize:'12px', letterSpacing:'2px', textTransform:'uppercase', margin:'0 0 4px' }}>Mahitaji ya Maji Yanatarajiwa</p>
+                    <p style={{ fontSize:'42px', fontWeight:900, background:'linear-gradient(90deg,#00c6ff,#0072ff)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', margin:0, lineHeight:1 }}>
+                      {predictionResult.value.toLocaleString()}
+                    </p>
+                    <p style={{ color:'rgba(255,255,255,0.45)', fontSize:'12px', marginTop:'4px' }}>lita / siku</p>
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{ height:'1px', background:'rgba(99,199,255,0.15)', margin:'0 0 16px' }} />
+
+                  {/* Input Summary Grid */}
+                  <p style={{ color:'rgba(170,212,255,0.6)', fontSize:'10px', letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:'10px' }}>Taarifa Ulizotoa</p>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px' }}>
+                    {[
+                      { label:'🌡️ Joto', value: `${predictionResult.inputs.temperature}°C` },
+                      { label:'🌧️ Mvua', value: `${predictionResult.inputs.rainfall} mm` },
+                      { label:'💧 Kiwango Maji', value: predictionResult.inputs.water_level },
+                      { label:'👥 Watu', value: Number(predictionResult.inputs.population).toLocaleString() },
+                      { label:'📍 Wilaya', value: predictionResult.inputs.district },
+                    ].map(({ label, value }) => (
+                      <div key={label} style={{ background:'rgba(255,255,255,0.05)', borderRadius:'10px', padding:'8px 12px' }}>
+                        <p style={{ color:'rgba(255,255,255,0.45)', fontSize:'10px', margin:'0 0 2px' }}>{label}</p>
+                        <p style={{ color:'#fff', fontSize:'13px', fontWeight:600, margin:0 }}>{value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Reset button */}
+                  <button onClick={resetChat} style={{ marginTop:'16px', width:'100%', padding:'10px', borderRadius:'10px', border:'1px solid rgba(0,198,255,0.3)', background:'rgba(0,114,255,0.15)', color:'#00c6ff', fontSize:'13px', fontWeight:700, cursor:'pointer', letterSpacing:'0.5px', transition:'background 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.background='rgba(0,114,255,0.3)'}
+                    onMouseLeave={e => e.currentTarget.style.background='rgba(0,114,255,0.15)'}>
+                    🔄 Uliza Tena
+                  </button>
+
+                  <style>{`@keyframes fadeSlideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }`}</style>
+                </div>
+              ) : (
+                <div className={`max-w-[80%] p-4 rounded-2xl ${
+                  msg.sender === 'user' 
+                    ? 'bg-blue-600 text-white rounded-br-none' 
                     : msg.isError
                       ? 'bg-red-900/50 border border-red-500 text-red-200'
                       : 'bg-[#282828] text-gray-200 rounded-bl-none'
-              }`}>
-                <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
-              </div>
+                }`}>
+                  <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
+                </div>
+              )}
             </div>
           ))}
           {isLoading && (
