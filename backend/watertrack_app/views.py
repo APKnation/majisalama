@@ -506,7 +506,7 @@ def model_insights(request):
         }
         
         # Actual vs Predicted statistics
-        errors = y - y_pred
+        errors = y - y_pred_total
         error_stats = {
             'mae': round(float(np.mean(np.abs(errors))), 2),
             'rmse': round(float(np.sqrt(np.mean(errors ** 2))), 2),
