@@ -25,6 +25,7 @@ router.register(r'messages', MessageViewSet)
 urlpatterns = [
     path('', health_check, name='health-check'),
     path('health/', health_check, name='health'),
+    path('api/health/', health_check, name='api-health'),
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/model-insights/', model_insights, name='model-insights'),
