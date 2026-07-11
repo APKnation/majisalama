@@ -10,16 +10,25 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
     'localhost,127.0.0.1'
 ).split(',') + ['.up.railway.app', '.railway.app', '.railway.internal']
 
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000'
+).split(',')
+
 # On Railway, accept all hosts (healthchecks hit the internal *.railway.internal host)
 if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_SERVICE_ID'):
     ALLOWED_HOSTS = ['*']
+    railway_domain = os.getenv('RAILWAY_PUBLIC_DOMAIN')
+    if railway_domain:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{railway_domain}')
+    CSRF_TRUSTED_ORIGINS.extend(['https://*.up.railway.app', 'https://*.railway.app'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -133,6 +142,9 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001'
 ).split(',')
+
+if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_SERVICE_ID'):
+    CORS_ALLOW_ALL_ORIGINS = True
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),

@@ -17,11 +17,13 @@ class Command(BaseCommand):
         email = os.getenv('DEFAULT_ADMIN_EMAIL', 'admin@example.com')
 
         if not User.objects.filter(username=username).exists():
-            user = User.objects.create_superuser(
+            user = User.objects.create_user(
                 username=username,
                 email=email,
                 password=password,
-                role='admin'
+                role='admin',
+                is_superuser=True,
+                is_staff=True
             )
             self.stdout.write(self.style.SUCCESS(f'Default admin user created: {username} / {password}'))
         else:

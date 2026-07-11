@@ -12,7 +12,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ .
-RUN python3 manage.py collectstatic --noinput || true
+RUN DATABASE_URL=sqlite:///:memory: python3 manage.py collectstatic --noinput || true
 
 COPY frontend/ ./frontend/
 RUN cd frontend && npm install && npm run build && cd ..
