@@ -36,7 +36,7 @@ export default function FloatingChatButton() {
         transform: hovered ? 'scale(1.05) translateY(-2px)' : 'scale(1)',
         overflow: 'hidden',
       }}
-      aria-label="Uliza Nikusaidia - AI Water Demand Predictor"
+      aria-label="Uliza Nikusaidie - AI Water Demand Predictor"
     >
       {/* Pulse ring */}
       <span style={{
