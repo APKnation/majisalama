@@ -1,14 +1,23 @@
 #!/usr/bin/env bash
 set -e
 
+echo "Starting deployment script..."
+echo "Python3 location: $(command -v python3 || echo 'NOT FOUND')"
+echo "PATH: $PATH"
+
+cd backend
 echo "Running migrations..."
-cd backend && python3 manage.py migrate --noinput && cd ..
+python3 manage.py migrate --noinput
 
 echo "Collecting static files..."
-cd backend && python3 manage.py collectstatic --noinput && cd ..
+python3 manage.py collectstatic --noinput
+cd ..
 
 echo "Building frontend..."
-cd frontend && npm install && npm run build && cd ..
+cd frontend
+npm install
+npm run build
+cd ..
 
 echo "Copying frontend build to static..."
 mkdir -p backend/staticfiles/frontend
