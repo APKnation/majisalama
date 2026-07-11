@@ -2,15 +2,15 @@
 set -e
 
 echo "Starting deployment script..."
-echo "Python3 location: $(command -v python3 || echo 'NOT FOUND')"
-echo "PATH: $PATH"
 
 cd backend
+
 echo "Running migrations..."
 python3 manage.py migrate --noinput
 
 echo "Collecting static files..."
 python3 manage.py collectstatic --noinput
+
 cd ..
 
 echo "Building frontend..."
