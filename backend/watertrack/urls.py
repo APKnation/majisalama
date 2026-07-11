@@ -31,7 +31,7 @@ router.register(r'users', UserViewSet)
 router.register(r'messages', MessageViewSet)
 
 urlpatterns = [
-    path('', health_check, name='health-check'),
+    path('', serve_frontend, name='frontend-root'),
     path('health/', health_check, name='health'),
     path('api/health/', health_check, name='api-health'),
     path('admin/', admin.site.urls),
