@@ -433,14 +433,16 @@ def model_insights(request):
         
         # Load training data
         df = pd.read_csv(csv_path)
-        X = df[['temperature', 'rainfall', 'humidity', 'population', 'water_level', 'pH', 'turbidity', 'flow_rate', 'district', 'month']]
+        numerical_features = ['temperature', 'rainfall', 'humidity', 'population', 'water_level', 'pH', 'turbidity', 'flow_rate']
+        categorical_features = ['district', 'month']
+        X = df[numerical_features + categorical_features]
         y = df['demand']
         
         # Compute R² on the full training set
-        # We need to transform the data through the pipeline
-        y_pred = model.predict(X)
+        y_pred_per_capita = model.predict(X)
+        y_pred_total = y_pred_per_capita * df['population'].values
         
-        ss_res = np.sum((y - y_pred) ** 2)
+        ss_res = np.sum((y - y_pred_total) ** 2)
         ss_tot = np.sum((y - y.mean()) ** 2)
         r2_score = 1 - (ss_res / ss_tot)
         
@@ -452,7 +454,6 @@ def model_insights(request):
         try:
             feature_names = list(preprocessor.get_feature_names_out())
         except Exception:
-            # Fallback: try to infer feature names
             feature_names = [f"feature_{i}" for i in range(len(regressor.feature_importances_))]
         
         importances = regressor.feature_importances_
@@ -461,15 +462,13 @@ def model_insights(request):
         readable_names = []
         for name in feature_names:
             if name.startswith('cat__'):
-                # Extract original categorical feature value
-                # Format: cat__district_Ilala, cat__month_Jan, etc.
                 parts = name.replace('cat__', '').split('_', 1)
                 if len(parts) == 2:
                     readable_names.append(f"{parts[0]}: {parts[1]}")
                 else:
                     readable_names.append(name)
-            elif name.startswith('remainder__'):
-                readable_names.append(name.replace('remainder__', ''))
+            elif name.startswith('num__'):
+                readable_names.append(name.replace('num__', ''))
             else:
                 readable_names.append(name)
         
@@ -489,7 +488,7 @@ def model_insights(request):
         for idx in sample_indices:
             sample_predictions.append({
                 'actual': round(float(y.iloc[idx]), 2),
-                'predicted': round(float(y_pred[idx]), 2)
+                'predicted': round(float(y_pred_total[idx]), 2)
             })
         
         # Model metadata
