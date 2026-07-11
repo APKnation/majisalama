@@ -17,7 +17,7 @@
     ]
   },
   "deploy": {
-    "startCommand": "cd backend && bash start.sh",
+    "startCommand": "bash start.sh",
     "restartPolicyType": "on-failure",
     "restartPolicyMaxRetries": 10
   },
