@@ -17,10 +17,8 @@ RUN python3 manage.py collectstatic --noinput || true
 COPY frontend/ ./frontend/
 RUN cd frontend && npm install && npm run build && cd ..
 
-# Ensure staticfiles directory exists before copying React build
-RUN mkdir -p backend/staticfiles
-ENV FRONTEND_BUILD_COPIED=true
-RUN cp -r frontend/build/* backend/staticfiles/
+# Copy entire React build into staticfiles so Django/whitenoise serves all assets
+RUN mkdir -p staticfiles && cp -r frontend/build/* staticfiles/
 
 EXPOSE 8000
 
