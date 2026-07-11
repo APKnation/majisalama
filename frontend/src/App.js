@@ -486,6 +486,14 @@ function App() {
               </AdminRoute>
             }
           />
+          <Route
+            path="/admin/model-insights"
+            element={
+              <AdminRoute>
+                <ModelInsights />
+              </AdminRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

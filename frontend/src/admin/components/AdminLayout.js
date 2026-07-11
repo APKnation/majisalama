@@ -12,6 +12,7 @@ const MENU = [
   { path: "/admin/villages",      label: "Vijiji",              abbr: "VJ" },
   { path: "/admin/users",         label: "Watumiaji",           abbr: "WA" },
   { path: "/admin/alerts",        label: "Arifa",               abbr: "AR" },
+  { path: "/admin/model-insights", label: "Mfanyabiashara",      abbr: "AI" },
 ];
 
 export default function AdminLayout({ children }) {
