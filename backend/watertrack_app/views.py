@@ -386,12 +386,13 @@ class AlertViewSet(viewsets.ModelViewSet):
 @permission_classes([AllowAny])
 @csrf_exempt
 def custom_login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    
+    data = request.data if request.data else request.POST
+    username = data.get('username')
+    password = data.get('password')
+
     if not username or not password:
         return Response({'error': 'Username and password required'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     user = authenticate(username=username, password=password)
     
     if user is None:
