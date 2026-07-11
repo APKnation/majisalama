@@ -16,7 +16,7 @@ export default function Login() {
     try {
       await login(formData.username, formData.password);
     } catch (err) {
-      setError("Jina la mtumiaji au nywila sio sahihi");
+      setError(err.message || "Jina la mtumiaji au nywila sio sahihi");
       setIsSubmitting(false);
     }
   };

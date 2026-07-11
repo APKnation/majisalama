@@ -60,7 +60,11 @@ const getRedirectPath = (userData) => {
       return response.data;
     } catch (error) {
       console.error("Login error:", error);
-      throw error;
+      const message =
+        error.response?.data?.error ||
+        error.response?.data?.detail ||
+        "Jina la mtumiaji au nywila sio sahihi";
+      throw new Error(message);
     }
   };
 
