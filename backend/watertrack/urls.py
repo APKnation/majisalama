@@ -15,7 +15,7 @@ def health_check(request):
 
 
 def serve_frontend(request, path=""):
-    frontend_path = os.path.join(settings.STATIC_ROOT, "frontend", "index.html")
+    frontend_path = os.path.join(settings.STATIC_ROOT, "index.html")
     if os.path.exists(frontend_path):
         return FileResponse(open(frontend_path, "rb"))
     return JsonResponse({"error": "Frontend not built"}, status=404)
