@@ -10,6 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from django.db.models import Q
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import os
 import joblib
 from .models import *
@@ -383,6 +384,7 @@ class AlertViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@csrf_exempt
 def custom_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -533,6 +535,7 @@ def model_insights(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@csrf_exempt
 def predict_water_demand(request):
     try:
         from datetime import datetime
