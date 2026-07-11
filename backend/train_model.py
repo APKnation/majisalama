@@ -3,49 +3,54 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import joblib
 import os
 
 def main():
-    # Load the data
     print("Loading data from water.csv...")
     csv_path = os.path.join(os.path.dirname(__file__), 'water.csv')
     df = pd.read_csv(csv_path)
 
-    # Features and Target
-    X = df[['temperature', 'rainfall', 'humidity', 'population', 'water_level', 'pH', 'turbidity', 'flow_rate', 'district', 'month']]
-    y = df['demand']
+    df['demand_per_capita'] = df['demand'] / df['population']
 
-    # Split data
+    numerical_features = ['temperature', 'rainfall', 'humidity', 'population', 'water_level', 'pH', 'turbidity', 'flow_rate']
+    categorical_features = ['district', 'month']
+
+    X = df[numerical_features + categorical_features]
+    y = df['demand_per_capita']
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Preprocessing
-    categorical_features = ['district', 'month']
+    numerical_transformer = StandardScaler()
     categorical_transformer = OneHotEncoder(handle_unknown='ignore')
-    
+
     preprocessor = ColumnTransformer(
         transformers=[
+            ('num', numerical_transformer, numerical_features),
             ('cat', categorical_transformer, categorical_features)
-        ],
-        remainder='passthrough' # Leave numerical features as they are
+        ]
     )
 
-    # Initialize pipeline
     print("Training Random Forest model pipeline...")
     model = Pipeline(steps=[
         ('preprocessor', preprocessor),
         ('regressor', RandomForestRegressor(n_estimators=100, random_state=42))
     ])
-    
-    # Train model
+
     model.fit(X_train, y_train)
 
-    # Evaluate
     score = model.score(X_test, y_test)
     print(f"Model R^2 Score on test set: {score:.4f}")
 
-    # Save model pipeline
+    y_pred = model.predict(X)
+    df['predicted_demand'] = y_pred * df['population']
+    df['actual_demand'] = df['demand']
+    df['error'] = df['actual_demand'] - df['predicted_demand']
+    print(f"Mean Absolute Error (total demand): {df['error'].abs().mean():.2f}")
+    print(f"Sample actual vs predicted total demand:")
+    print(df[['district', 'population', 'actual_demand', 'predicted_demand']].head())
+
     model_path = os.path.join(os.path.dirname(__file__), 'water_model.pkl')
     joblib.dump(model, model_path)
     print(f"Model saved to {model_path}")
