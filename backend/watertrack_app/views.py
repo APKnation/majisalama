@@ -413,6 +413,118 @@ def custom_login(request):
         }
     })
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def model_insights(request):
+    try:
+        import pandas as pd
+        import numpy as np
+        from datetime import datetime
+        
+        model_path = os.path.join(settings.BASE_DIR, 'water_model.pkl')
+        csv_path = os.path.join(settings.BASE_DIR, 'water.csv')
+        
+        if not os.path.exists(model_path):
+            return Response({'error': 'Model not found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if not os.path.exists(csv_path):
+            return Response({'error': 'Training data not found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        model = joblib.load(model_path)
+        
+        # Load training data
+        df = pd.read_csv(csv_path)
+        X = df[['temperature', 'rainfall', 'humidity', 'population', 'water_level', 'pH', 'turbidity', 'flow_rate', 'district', 'month']]
+        y = df['demand']
+        
+        # Compute R² on the full training set
+        # We need to transform the data through the pipeline
+        y_pred = model.predict(X)
+        
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - y.mean()) ** 2)
+        r2_score = 1 - (ss_res / ss_tot)
+        
+        # Feature importances from the RandomForest regressor
+        regressor = model.named_steps['regressor']
+        preprocessor = model.named_steps['preprocessor']
+        
+        # Get feature names after preprocessing
+        try:
+            feature_names = list(preprocessor.get_feature_names_out())
+        except Exception:
+            # Fallback: try to infer feature names
+            feature_names = [f"feature_{i}" for i in range(len(regressor.feature_importances_))]
+        
+        importances = regressor.feature_importances_
+        
+        # Map feature names back to original readable names
+        readable_names = []
+        for name in feature_names:
+            if name.startswith('cat__'):
+                # Extract original categorical feature value
+                # Format: cat__district_Ilala, cat__month_Jan, etc.
+                parts = name.replace('cat__', '').split('_', 1)
+                if len(parts) == 2:
+                    readable_names.append(f"{parts[0]}: {parts[1]}")
+                else:
+                    readable_names.append(name)
+            elif name.startswith('remainder__'):
+                readable_names.append(name.replace('remainder__', ''))
+            else:
+                readable_names.append(name)
+        
+        # Sort by importance descending
+        sorted_indices = np.argsort(importances)[::-1]
+        top_features = []
+        for idx in sorted_indices[:20]:
+            top_features.append({
+                'feature': readable_names[idx] if idx < len(readable_names) else f"feature_{idx}",
+                'importance': round(float(importances[idx]), 4)
+            })
+        
+        # Prepare sample predictions for visualization
+        sample_size = min(50, len(df))
+        sample_indices = np.random.choice(len(df), sample_size, replace=False)
+        sample_predictions = []
+        for idx in sample_indices:
+            sample_predictions.append({
+                'actual': round(float(y.iloc[idx]), 2),
+                'predicted': round(float(y_pred[idx]), 2)
+            })
+        
+        # Model metadata
+        metadata = {
+            'model_type': 'RandomForestRegressor',
+            'n_estimators': regressor.n_estimators,
+            'max_depth': regressor.max_depth,
+            'min_samples_split': regressor.min_samples_split,
+            'min_samples_leaf': regressor.min_samples_leaf,
+            'n_features': len(feature_names),
+            'training_samples': len(df),
+            'test_size': '20%',
+            'random_state': 42,
+            'trained_at': datetime.fromtimestamp(os.path.getmtime(model_path)).isoformat()
+        }
+        
+        # Actual vs Predicted statistics
+        errors = y - y_pred
+        error_stats = {
+            'mae': round(float(np.mean(np.abs(errors))), 2),
+            'rmse': round(float(np.sqrt(np.mean(errors ** 2))), 2),
+            'max_error': round(float(np.max(np.abs(errors))), 2),
+            'mean_error': round(float(np.mean(errors)), 2)
+        }
+        
+        return Response({
+            'r2_score': round(float(r2_score), 4),
+            'model_metadata': metadata,
+            'feature_importances': top_features,
+            'sample_predictions': sample_predictions,
+            'error_stats': error_stats
+        })
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def predict_water_demand(request):

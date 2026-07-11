@@ -27,6 +27,7 @@ urlpatterns = [
     path('health/', health_check, name='health'),
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/model-insights/', model_insights, name='model-insights'),
     path('api/predict-demand/', predict_water_demand, name='predict-demand'),
     path('api/auth/login/', custom_login, name='custom-login'),
     path('api/auth/', include('dj_rest_auth.urls')),
