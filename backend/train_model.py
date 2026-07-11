@@ -27,7 +27,11 @@ def main():
     X = df[numerical_features + categorical_features]
     y = df['demand_per_capita']
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    df['sort_key'] = df['year'] * 100 + df['month']
+    df = df.sort_values(['district', 'sort_key']).reset_index(drop=True)
+    split_idx = int(len(df) * 0.8)
+    X_train, X_test = X.iloc[:split_idx], X.iloc[split_idx:]
+    y_train, y_test = y.iloc[:split_idx], y.iloc[split_idx:]
 
     numerical_transformer = StandardScaler()
     categorical_transformer = OneHotEncoder(handle_unknown='ignore')
@@ -42,13 +46,14 @@ def main():
     print("Training Random Forest model pipeline...")
     model = Pipeline(steps=[
         ('preprocessor', preprocessor),
-        ('regressor', RandomForestRegressor(n_estimators=100, random_state=42))
+        ('regressor', RandomForestRegressor(n_estimators=100, max_depth=12, min_samples_split=5, min_samples_leaf=2, random_state=42))
     ])
 
     model.fit(X_train, y_train)
 
     score = model.score(X_test, y_test)
     print(f"Model R^2 Score on test set: {score:.4f}")
+    print(f"Model R^2 Score on train set: {model.score(X_train, y_train):.4f}")
 
     y_pred = model.predict(X)
     df['predicted_demand'] = y_pred * df['population']
