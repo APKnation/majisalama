@@ -21,6 +21,13 @@ def serve_frontend(request, path=""):
     return JsonResponse({"error": "Frontend not built"}, status=404)
 
 
+def serve_static_file(request, path=""):
+    file_path = os.path.join(settings.STATIC_ROOT, path)
+    if path and os.path.isfile(file_path):
+        return FileResponse(open(file_path, "rb"))
+    return serve_frontend(request)
+
+
 router = DefaultRouter()
 router.register(r'villages', VillageViewSet)
 router.register(r'water-sources', WaterSourceViewSet)
@@ -43,10 +50,10 @@ urlpatterns = [
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
 ]
 
-# Serve React frontend for all non-API routes
-if os.path.exists(os.path.join(settings.STATIC_ROOT, "frontend", "index.html")):
+# Serve React static files and SPA for all non-API routes
+if os.path.exists(os.path.join(settings.STATIC_ROOT, "index.html")):
     urlpatterns += [
-        path("<path:path>", serve_frontend),
+        path("<path:path>", serve_static_file),
     ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
