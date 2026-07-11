@@ -143,9 +143,6 @@ export default function Home() {
                 <Link to="/report" className="btn-m-primary">
                   Ripoti Uharibifu
                 </Link>
-                <Link to="/map" className="btn-m-outline">
-                  Ona Ramani
-                </Link>
               </div>
             </div>
 
@@ -221,7 +218,6 @@ export default function Home() {
                 Ripoti za Hivi Karibuni
               </h2>
             </div>
-            <Link to="/map" className="btn-m-outline">Ona Ramani</Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -11,7 +11,6 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import MapView from "./pages/MapView";
 import WaterSourceDetail from "./pages/WaterSourceDetail";
 import ReportDamage from "./pages/ReportDamage";
 import Dashboard from "./pages/Dashboard";
@@ -149,18 +148,6 @@ function App() {
                 <>
                   <Navbar />
                   <ChatbotPredictor />
-                  <Footer />
-                </>
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/map"
-            element={
-              <PublicRoute>
-                <>
-                  <Navbar />
-                  <MapView />
                   <Footer />
                 </>
               </PublicRoute>

@@ -219,9 +219,6 @@ export default function Dashboard() {
           <Link to="/messages" style={{ color: "#7e7e7e", fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none" }}>
             Ujumbe
           </Link>
-          <Link to="/map" style={{ color: "#7e7e7e", fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none" }}>
-            Ramani
-          </Link>
         </div>
       </nav>
 

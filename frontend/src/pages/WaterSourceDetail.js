@@ -40,8 +40,8 @@ export default function WaterSourceDetail() {
       <div className="m-stripe" />
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 32px" }}>
         <div style={{ marginBottom: "32px" }}>
-          <Link to="/map" style={{ color: "#0066b1", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none" }}>
-            ← Rudi kwenye Ramani
+          <Link to="/" style={{ color: "#0066b1", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none" }}>
+            ← Rudi Mwanzo
           </Link>
         </div>
 

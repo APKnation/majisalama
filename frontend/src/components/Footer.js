@@ -32,7 +32,6 @@ const Footer = () => {
               heading: "Viungo vya Haraka",
               links: [
                 { to: "/", label: "Mwanzo" },
-                { to: "/map", label: "Ramani ya Maji" },
                 { to: "/report", label: "Ripoti Tatizo" },
                 { to: "/dashboard", label: "Dashibodi" },
               ],

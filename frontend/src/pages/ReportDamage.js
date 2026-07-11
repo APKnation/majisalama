@@ -30,7 +30,7 @@ export default function ReportDamage() {
         title: formData.title, description: formData.description, priority: formData.priority,
       });
       setSuccess(true);
-      setTimeout(() => navigate("/map"), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       console.error(error);
       alert("Kuna hitilafu. Tafadhali jaribu tena.");
