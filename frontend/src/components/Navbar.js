@@ -22,7 +22,7 @@ export default function Navbar() {
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-6">
-          {[{ to: "/", label: "Nyumbani" }, { to: "/map", label: "Ramani" }].map(({ to, label }) => (
+          {[{ to: "/", label: "Nyumbani" }, { to: "/predict", label: "Uliza" }].map(({ to, label }) => (
             <Link key={to} to={to} style={{ color: "#7e7e7e", fontSize: "13px", letterSpacing: "0.5px", textDecoration: "none", transition: "color 0.15s" }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#7e7e7e")}
@@ -64,7 +64,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div style={{ background: "#0d0d0d", borderTop: "1px solid #3c3c3c", padding: "16px 24px" }}>
-          {[{ to: "/", label: "Nyumbani" }, { to: "/map", label: "Ramani" }].map(({ to, label }) => (
+          {[{ to: "/", label: "Nyumbani" }, { to: "/predict", label: "Uliza" }].map(({ to, label }) => (
             <Link key={to} to={to} onClick={() => setMobileOpen(false)}
               style={{ display: "block", color: "#7e7e7e", fontSize: "13px", padding: "10px 0", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}>
               {label}
