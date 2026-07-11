@@ -566,10 +566,12 @@ def predict_water_demand(request):
             'month': month
         }])
         
-        prediction = model.predict(input_data)
+        predicted_per_capita = model.predict(input_data)[0]
+        prediction = predicted_per_capita * population
         
         return Response({
-            'predicted_demand': prediction[0],
+            'predicted_demand': round(prediction, 2),
+            'predicted_per_capita': round(predicted_per_capita, 4),
             'inputs': {
                 'temperature': temperature,
                 'rainfall': rainfall,
