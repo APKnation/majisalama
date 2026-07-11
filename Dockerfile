@@ -18,9 +18,9 @@ COPY frontend/ ./frontend/
 RUN cd frontend && npm install && npm run build && cd ..
 
 # Copy React static assets so Django serves them at /static/
-RUN cp -r frontend/build/static/* staticfiles/static/
+RUN cp -r frontend/build/static/* backend/staticfiles/static/
 # Copy React index.html so root URL can serve the SPA
-RUN cp frontend/build/index.html staticfiles/index.html
+RUN cp frontend/build/index.html backend/staticfiles/index.html
 
 EXPOSE 8000
 
