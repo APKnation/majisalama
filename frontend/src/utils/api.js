@@ -3,7 +3,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000/api",
+  baseURL: process.env.REACT_APP_API_URL || "/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -40,7 +40,7 @@ api.interceptors.response.use(
         console.log("Refreshing token..."); // Debug
 
         const response = await axios.post(
-          `${(process.env.REACT_APP_API_URL || "http://localhost:8000/api")}/auth/token/refresh/`,
+          `${api.defaults.baseURL}/auth/token/refresh/`,
           {
             refresh: refreshToken,
           },
