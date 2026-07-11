@@ -22,4 +22,4 @@ RUN mkdir -p staticfiles && cp -r frontend/build/* staticfiles/
 
 EXPOSE 8000
 
-CMD python3 manage.py migrate --noinput && gunicorn watertrack.wsgi:application --bind 0.0.0.0:$PORT
+CMD python3 manage.py migrate --noinput && python3 manage.py create_default_user && gunicorn watertrack.wsgi:application --bind 0.0.0.0:$PORT
