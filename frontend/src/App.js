@@ -46,6 +46,7 @@ import VillagesAdmin from "./admin/pages/VillagesAdmin";
 import DamageReportsAdmin from "./admin/pages/DamageReportsAdmin";
 import QualityReportsAdmin from "./admin/pages/QualityReportsAdmin";
 import AlertsAdmin from "./admin/pages/AlertsAdmin";
+import ModelInsights from "./admin/pages/ModelInsights";
 import ChatbotPredictor from "./pages/ChatbotPredictor";
 import FloatingChatButton from "./components/FloatingChatButton";
 
