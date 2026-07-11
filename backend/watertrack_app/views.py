@@ -386,14 +386,30 @@ class AlertViewSet(viewsets.ModelViewSet):
 @permission_classes([AllowAny])
 @csrf_exempt
 def custom_login(request):
-    data = request.data if request.data else request.POST
-    username = data.get('username')
+    data = None
+    if request.content_type == 'application/json':
+        try:
+            data = request.data
+        except Exception:
+            data = {}
+    else:
+        data = request.data if request.data else request.POST
+
+    username = data.get('username') or data.get('email')
     password = data.get('password')
 
     if not username or not password:
         return Response({'error': 'Username and password required'}, status=status.HTTP_400_BAD_REQUEST)
 
     user = authenticate(username=username, password=password)
+    if user is None:
+        # fallback: allow login by email as well
+        from watertrack_app.models import User
+        try:
+            user_obj = User.objects.get(email__iexact=username)
+            user = authenticate(username=user_obj.username, password=password)
+        except User.DoesNotExist:
+            user = None
     
     if user is None:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
