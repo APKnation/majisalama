@@ -17,10 +17,8 @@ RUN python3 manage.py collectstatic --noinput || true
 COPY frontend/ ./frontend/
 RUN cd frontend && npm install && npm run build && cd ..
 
-# Copy React static assets so Django serves them at /static/
-RUN cp -r frontend/build/static/* backend/staticfiles/static/
-# Copy React index.html so root URL can serve the SPA
-RUN cp frontend/build/index.html backend/staticfiles/index.html
+# Copy entire React build into staticfiles so Django/whitenoise serves all assets
+RUN cp -r frontend/build/* backend/staticfiles/
 
 EXPOSE 8000
 
