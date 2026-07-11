@@ -1,28 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
 
 const districts = ["Ilala", "Kinondoni", "Temeke", "Kigamboni", "Ubungo", "Arusha", "Mwanza", "Dodoma", "Mbeya", "Morogoro"];
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+const districtDefaults = {
+  'Ilala': { humidity: 65, water_level: 75, pH: 7.0, turbidity: 2.5, flow_rate: 55 },
+  'Kinondoni': { humidity: 62, water_level: 80, pH: 7.1, turbidity: 2.2, flow_rate: 50 },
+  'Temeke': { humidity: 68, water_level: 60, pH: 6.9, turbidity: 3.0, flow_rate: 45 },
+  'Kigamboni': { humidity: 70, water_level: 85, pH: 7.2, turbidity: 1.8, flow_rate: 40 },
+  'Ubungo': { humidity: 64, water_level: 70, pH: 7.0, turbidity: 2.6, flow_rate: 52 },
+  'Arusha': { humidity: 60, water_level: 65, pH: 7.3, turbidity: 2.0, flow_rate: 48 },
+  'Mwanza': { humidity: 72, water_level: 55, pH: 6.8, turbidity: 3.2, flow_rate: 42 },
+  'Dodoma': { humidity: 55, water_level: 50, pH: 7.4, turbidity: 1.9, flow_rate: 38 },
+  'Mbeya': { humidity: 66, water_level: 68, pH: 7.1, turbidity: 2.4, flow_rate: 47 },
+  'Morogoro': { humidity: 67, water_level: 62, pH: 7.0, turbidity: 2.7, flow_rate: 44 },
+};
+
 export default function ChatbotPredictor() {
+  const currentMonth = new Date().toLocaleString('en-US', { month: 'short' });
+  
   const [form, setForm] = useState({
+    district: 'Ilala',
     temperature: '',
     rainfall: '',
-    humidity: '',
     population: '',
-    water_level: '',
-    pH: '',
-    turbidity: '',
-    flow_rate: '',
-    district: 'Ilala',
-    month: new Date().toLocaleString('en-US', { month: 'short' }),
-    forecast_rainfall: '',
-    forecast_temperature: '',
-    is_holiday: 0
+    month: currentMonth
   });
+  
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const defaults = districtDefaults[form.district] || districtDefaults['Ilala'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,17 +50,9 @@ export default function ChatbotPredictor() {
       const payload = {
         temperature: parseFloat(form.temperature),
         rainfall: parseFloat(form.rainfall),
-        humidity: parseFloat(form.humidity),
         population: parseInt(form.population),
-        water_level: parseFloat(form.water_level),
-        pH: parseFloat(form.pH),
-        turbidity: parseFloat(form.turbidity),
-        flow_rate: parseFloat(form.flow_rate),
         district: form.district,
-        month: form.month,
-        forecast_rainfall: form.forecast_rainfall ? parseFloat(form.forecast_rainfall) : parseFloat(form.rainfall),
-        forecast_temperature: form.forecast_temperature ? parseFloat(form.forecast_temperature) : parseFloat(form.temperature),
-        is_holiday: parseInt(form.is_holiday)
+        month: form.month
       };
       const response = await api.post('/predict-demand/', payload);
       setResult(response.data);
@@ -71,8 +73,7 @@ export default function ChatbotPredictor() {
     fontWeight: 400,
     outline: 'none',
     boxSizing: 'border-box',
-    transition: 'border-color 0.15s ease',
-    fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+    transition: 'border-color 0.15s ease'
   };
 
   const labelStyle = {
@@ -82,29 +83,25 @@ export default function ChatbotPredictor() {
     fontWeight: 700,
     letterSpacing: '1.5px',
     textTransform: 'uppercase',
-    marginBottom: '8px',
-    fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+    marginBottom: '8px'
   };
 
   return (
     <div style={{ background: '#000000', minHeight: '100vh', color: '#ffffff' }}>
-      {/* M STRIPE DIVIDER */}
       <div style={{
         height: '4px',
         background: 'linear-gradient(90deg, #0066b1 0%, #1c69d4 50%, #e22718 100%)'
       }} />
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 32px 64px' }}>
-        {/* HEADER */}
-        <div style={{ marginBottom: '64px' }}>
+      <div style={{ maxWidth: '680px', margin: '0 auto', padding: '80px 24px 64px' }}>
+        <div style={{ marginBottom: '48px' }}>
           <p style={{
             color: '#0066b1',
             fontSize: '10px',
             fontWeight: 700,
             letterSpacing: '1.5px',
             textTransform: 'uppercase',
-            marginBottom: '16px',
-            fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+            marginBottom: '16px'
           }}>
             Ufahamu wa AI
           </p>
@@ -114,8 +111,7 @@ export default function ChatbotPredictor() {
             fontWeight: 700,
             textTransform: 'uppercase',
             lineHeight: 1.05,
-            marginBottom: '16px',
-            fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+            marginBottom: '16px'
           }}>
             Utabiri wa Maji
           </h1>
@@ -123,138 +119,15 @@ export default function ChatbotPredictor() {
             color: '#7e7e7e',
             fontSize: '14px',
             fontWeight: 300,
-            lineHeight: 1.5,
-            maxWidth: '600px'
+            lineHeight: 1.5
           }}>
-            Weka taarifa za hali ya sasa ili mfanyakabiashara wa Random Forest akutoa utabiri wa mahitaji ya maji kwa kipindi kilichofuata.
+            Weka taarifa muhimu za kujumlisha ili upate utabiri wa mahitaji ya maji.
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px 40px' }}>
-            {/* WEATHER CONDITIONS */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
             <div style={{ gridColumn: '1 / -1' }}>
-              <p style={{
-                color: '#7e7e7e',
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '1.5px',
-                textTransform: 'uppercase',
-                marginBottom: '16px',
-                paddingBottom: '8px',
-                borderBottom: '1px solid #3c3c3c',
-                fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
-              }}>
-                Hali ya Hewa
-              </p>
-            </div>
-
-            {[
-              { name: 'temperature', label: 'Joto', unit: '°C', placeholder: 'mfano: 28', type: 'number' },
-              { name: 'rainfall', label: 'Mvua (sasa)', unit: 'mm', placeholder: 'mfano: 120', type: 'number' },
-              { name: 'humidity', label: 'Ungamo', unit: '%', placeholder: 'mfano: 70', type: 'number' },
-              { name: 'forecast_temperature', label: 'Joto (utabiri)', unit: '°C', placeholder: 'mfano: 30', type: 'number' },
-              { name: 'forecast_rainfall', label: 'Mvua (utabiri)', unit: 'mm', placeholder: 'mfano: 80', type: 'number' },
-            ].map(({ name, label, unit, placeholder, type }) => (
-              <div key={name}>
-                <label style={labelStyle}>{label}</label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    required
-                    type={type}
-                    step="any"
-                    name={name}
-                    value={form[name]}
-                    onChange={handleChange}
-                    placeholder={placeholder}
-                    style={inputStyle}
-                    onFocus={(e) => e.target.style.borderColor = '#ffffff'}
-                    onBlur={(e) => e.target.style.borderColor = '#3c3c3c'}
-                  />
-                  <span style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#7e7e7e',
-                    fontSize: '11px',
-                    fontWeight: 400
-                  }}>{unit}</span>
-                </div>
-              </div>
-            ))}
-
-            {/* WATER QUALITY */}
-            <div style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
-              <p style={{
-                color: '#7e7e7e',
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '1.5px',
-                textTransform: 'uppercase',
-                marginBottom: '16px',
-                paddingBottom: '8px',
-                borderBottom: '1px solid #3c3c3c',
-                fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
-              }}>
-                Ubora wa Maji
-              </p>
-            </div>
-
-            {[
-              { name: 'water_level', label: 'Kiwango cha Maji', unit: 'cm', placeholder: 'mfano: 80' },
-              { name: 'pH', label: 'pH', unit: '', placeholder: 'mfano: 7.0' },
-              { name: 'turbidity', label: 'Turbidity', unit: 'NTU', placeholder: 'mfano: 2.5' },
-              { name: 'flow_rate', label: 'Kasi ya Mtiririko', unit: 'L/s', placeholder: 'mfano: 50' },
-            ].map(({ name, label, unit, placeholder }) => (
-              <div key={name}>
-                <label style={labelStyle}>{label}</label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    required
-                    type="number"
-                    step="any"
-                    name={name}
-                    value={form[name]}
-                    onChange={handleChange}
-                    placeholder={placeholder}
-                    style={inputStyle}
-                    onFocus={(e) => e.target.style.borderColor = '#ffffff'}
-                    onBlur={(e) => e.target.style.borderColor = '#3c3c3c'}
-                  />
-                  {unit && (
-                    <span style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#7e7e7e',
-                      fontSize: '11px',
-                      fontWeight: 400
-                    }}>{unit}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {/* LOCATION & TIME */}
-            <div style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
-              <p style={{
-                color: '#7e7e7e',
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '1.5px',
-                textTransform: 'uppercase',
-                marginBottom: '16px',
-                paddingBottom: '8px',
-                borderBottom: '1px solid #3c3c3c',
-                fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
-              }}>
-                Mahali na Muda
-              </p>
-            </div>
-
-            <div>
               <label style={labelStyle}>Wilaya</label>
               <select
                 name="district"
@@ -269,37 +142,58 @@ export default function ChatbotPredictor() {
             </div>
 
             <div>
-              <label style={labelStyle}>Mwezi</label>
-              <select
-                name="month"
-                value={form.month}
-                onChange={handleChange}
-                style={{ ...inputStyle, cursor: 'pointer' }}
-                onFocus={(e) => e.target.style.borderColor = '#ffffff'}
-                onBlur={(e) => e.target.style.borderColor = '#3c3c3c'}
-              >
-                {months.map(m => <option key={m} value={m} style={{ background: '#0d0d0d' }}>{m}</option>)}
-              </select>
+              <label style={labelStyle}>Joto</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  required
+                  type="number"
+                  step="any"
+                  name="temperature"
+                  value={form.temperature}
+                  onChange={handleChange}
+                  placeholder="mfano: 28"
+                  style={inputStyle}
+                  onFocus={(e) => e.target.style.borderColor = '#ffffff'}
+                  onBlur={(e) => e.target.style.borderColor = '#3c3c3c'}
+                />
+                <span style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#7e7e7e',
+                  fontSize: '11px'
+                }}>°C</span>
+              </div>
             </div>
 
-            {/* POPULATION */}
-            <div style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
-              <p style={{
-                color: '#7e7e7e',
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '1.5px',
-                textTransform: 'uppercase',
-                marginBottom: '16px',
-                paddingBottom: '8px',
-                borderBottom: '1px solid #3c3c3c',
-                fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
-              }}>
-                Idadi ya Watu
-              </p>
+            <div>
+              <label style={labelStyle}>Mvua</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  required
+                  type="number"
+                  step="any"
+                  name="rainfall"
+                  value={form.rainfall}
+                  onChange={handleChange}
+                  placeholder="mfano: 120"
+                  style={inputStyle}
+                  onFocus={(e) => e.target.style.borderColor = '#ffffff'}
+                  onBlur={(e) => e.target.style.borderColor = '#3c3c3c'}
+                />
+                <span style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#7e7e7e',
+                  fontSize: '11px'
+                }}>mm</span>
+              </div>
             </div>
 
-            <div style={{ gridColumn: '1 / -1', maxWidth: '400px' }}>
+            <div>
               <label style={labelStyle}>Idadi ya Watu</label>
               <div style={{ position: 'relative' }}>
                 <input
@@ -319,14 +213,26 @@ export default function ChatbotPredictor() {
                   top: '50%',
                   transform: 'translateY(-50%)',
                   color: '#7e7e7e',
-                  fontSize: '11px',
-                  fontWeight: 400
+                  fontSize: '11px'
                 }}>watu</span>
               </div>
             </div>
 
-            {/* SUBMIT */}
-            <div style={{ gridColumn: '1 / -1', marginTop: '24px' }}>
+            <div>
+              <label style={labelStyle}>Mwezi</label>
+              <select
+                name="month"
+                value={form.month}
+                onChange={handleChange}
+                style={{ ...inputStyle, cursor: 'pointer' }}
+                onFocus={(e) => e.target.style.borderColor = '#ffffff'}
+                onBlur={(e) => e.target.style.borderColor = '#3c3c3c'}
+              >
+                {months.map(m => <option key={m} value={m} style={{ background: '#0d0d0d' }}>{m}</option>)}
+              </select>
+            </div>
+
+            <div style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
               <button
                 type="submit"
                 disabled={loading}
@@ -342,8 +248,7 @@ export default function ChatbotPredictor() {
                   letterSpacing: '1.5px',
                   textTransform: 'uppercase',
                   cursor: loading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.15s ease',
-                  fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+                  transition: 'all 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
                   if (!loading) e.currentTarget.style.background = '#e6e6e6';
@@ -358,7 +263,6 @@ export default function ChatbotPredictor() {
           </div>
         </form>
 
-        {/* ERROR */}
         {error && (
           <div style={{
             marginTop: '32px',
@@ -372,10 +276,8 @@ export default function ChatbotPredictor() {
           </div>
         )}
 
-        {/* RESULT */}
         {result && (
           <div style={{ marginTop: '64px' }}>
-            {/* M STRIPE */}
             <div style={{
               height: '4px',
               background: 'linear-gradient(90deg, #0066b1 0%, #1c69d4 50%, #e22718 100%)',
@@ -398,8 +300,7 @@ export default function ChatbotPredictor() {
                   color: '#ffffff',
                   fontSize: 'clamp(40px, 5vw, 64px)',
                   fontWeight: 700,
-                  lineHeight: 1,
-                  fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+                  lineHeight: 1
                 }}>
                   {Math.round(result.predicted_demand).toLocaleString()}
                 </span>
@@ -418,7 +319,6 @@ export default function ChatbotPredictor() {
               </p>
             </div>
 
-            {/* METRICS GRID */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -447,8 +347,7 @@ export default function ChatbotPredictor() {
                     color: accent,
                     fontSize: '20px',
                     fontWeight: 700,
-                    lineHeight: 1.2,
-                    fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+                    lineHeight: 1.2
                   }}>
                     {value}
                   </p>
@@ -456,7 +355,6 @@ export default function ChatbotPredictor() {
               ))}
             </div>
 
-            {/* INPUT SUMMARY */}
             <div>
               <p style={{
                 color: '#7e7e7e',
@@ -466,7 +364,7 @@ export default function ChatbotPredictor() {
                 textTransform: 'uppercase',
                 marginBottom: '16px'
               }}>
-                Taarifa Ulizotoa
+                Taarifa Zilizotumika
               </p>
               <div style={{
                 display: 'grid',
@@ -475,14 +373,14 @@ export default function ChatbotPredictor() {
                 background: '#1a1a1a'
               }}>
                 {[
-                  { label: 'JOTO', value: `${result.inputs.temperature}°C` },
                   { label: 'MVUA', value: `${result.inputs.rainfall} mm` },
-                  { label: 'UNGANO', value: `${result.inputs.humidity}%` },
                   { label: 'WATU', value: Number(result.inputs.population).toLocaleString() },
-                  { label: 'KIWANGO', value: `${result.inputs.water_level} cm` },
-                  { label: 'PH', value: result.inputs.pH },
-                  { label: 'TURBIDITY', value: `${result.inputs.turbidity} NTU` },
-                  { label: 'MTIRIRIKO', value: `${result.inputs.flow_rate} L/s` },
+                  { label: 'KIWANGO', value: `${result.inputs.water_level || defaults.water_level} cm` },
+                  { label: 'PH', value: result.inputs.pH || defaults.pH },
+                  { label: 'TURBIDITY', value: `${result.inputs.turbidity || defaults.turbidity} NTU` },
+                  { label: 'MTIRIRIKO', value: `${result.inputs.flow_rate || defaults.flow_rate} L/s` },
+                  { label: 'UNGANO', value: `${result.inputs.humidity || defaults.humidity}%` },
+                  { label: 'MFANYABIASHARA', value: 'Random Forest' },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: '#0d0d0d', padding: '16px 20px' }}>
                     <p style={{ color: '#7e7e7e', fontSize: '9px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
@@ -496,15 +394,15 @@ export default function ChatbotPredictor() {
               </div>
             </div>
 
-            {/* RESET */}
             <div style={{ marginTop: '40px' }}>
               <button
                 onClick={() => {
                   setForm({
-                    temperature: '', rainfall: '', humidity: '', population: '',
-                    water_level: '', pH: '', turbidity: '', flow_rate: '',
-                    district: 'Ilala', month: new Date().toLocaleString('en-US', { month: 'short' }),
-                    forecast_rainfall: '', forecast_temperature: '', is_holiday: 0
+                    district: 'Ilala',
+                    temperature: '',
+                    rainfall: '',
+                    population: '',
+                    month: new Date().toLocaleString('en-US', { month: 'short' })
                   });
                   setResult(null);
                   setError('');
@@ -519,8 +417,7 @@ export default function ChatbotPredictor() {
                   letterSpacing: '1px',
                   textTransform: 'uppercase',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  fontFamily: "'BMWTypeNextLatin', 'Inter', sans-serif"
+                  transition: 'all 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = '#ffffff';
