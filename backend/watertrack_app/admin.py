@@ -1,7 +1,6 @@
 # backend/watertrack_app/admin.py
 
 from django.contrib import admin
-from django.contrib.gis.admin import GISModelAdmin  # ✅ BADILISHA HII
 from .models import *
 
 @admin.register(User)
@@ -11,12 +10,12 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['username', 'email']
 
 @admin.register(Village)
-class VillageAdmin(GISModelAdmin):  # ✅ BADILISHA HII
+class VillageAdmin(admin.ModelAdmin):
     list_display = ['name', 'district', 'region', 'population']
     search_fields = ['name', 'district']
 
 @admin.register(WaterSource)
-class WaterSourceAdmin(GISModelAdmin):  # ✅ BADILISHA HII
+class WaterSourceAdmin(admin.ModelAdmin):
     list_display = ['name', 'source_type', 'village', 'status', 'last_tested']
     list_filter = ['status', 'source_type']
     search_fields = ['name']
@@ -34,3 +33,9 @@ class QualityReportAdmin(admin.ModelAdmin):
 class AlertAdmin(admin.ModelAdmin):
     list_display = ['alert_type', 'water_source', 'created_at']
     list_filter = ['alert_type']
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'sender', 'recipient', 'subject', 'is_read', 'created_at']
+    list_filter = ['is_read', 'created_at']
+    search_fields = ['sender__username', 'recipient__username', 'subject']
