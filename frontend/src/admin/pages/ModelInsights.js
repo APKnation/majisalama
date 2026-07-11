@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import AdminLayout from "../admin/components/AdminLayout";
-import api from "../utils/api";
+import AdminLayout from "../components/AdminLayout";
+import api from "../../utils/api";
 
 function ScoreCard({ title, value, accent, sub }) {
   return (
