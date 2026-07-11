@@ -2,15 +2,23 @@
 
 from django.contrib import admin
 from django.urls import path, include
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from rest_framework.routers import DefaultRouter
 from watertrack_app.views import *
 from django.conf import settings
 from django.conf.urls.static import static
+import os
 
 
 def health_check(request):
     return JsonResponse({"status": "ok"})
+
+
+def serve_frontend(request, path=""):
+    frontend_path = os.path.join(settings.STATIC_ROOT, "frontend", "index.html")
+    if os.path.exists(frontend_path):
+        return FileResponse(open(frontend_path, "rb"))
+    return JsonResponse({"error": "Frontend not built"}, status=404)
 
 
 router = DefaultRouter()
@@ -33,4 +41,12 @@ urlpatterns = [
     path('api/auth/login/', custom_login, name='custom-login'),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Serve React frontend for all non-API routes
+if os.path.exists(os.path.join(settings.STATIC_ROOT, "frontend", "index.html")):
+    urlpatterns += [
+        path("<path:path>", serve_frontend),
+    ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
