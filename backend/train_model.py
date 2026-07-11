@@ -14,8 +14,15 @@ def main():
 
     df['demand_per_capita'] = df['demand'] / df['population']
 
-    numerical_features = ['temperature', 'rainfall', 'humidity', 'population', 'water_level', 'pH', 'turbidity', 'flow_rate']
-    categorical_features = ['district', 'month']
+    numerical_features = [
+        'temperature', 'rainfall', 'humidity', 'population', 'water_level', 'pH', 'turbidity', 'flow_rate',
+        'year', 'day_of_week', 'is_weekend', 'is_holiday',
+        'income_level', 'industrial_activity', 'tourism',
+        'pipe_age', 'leakage_rate', 'storage_capacity',
+        'forecast_rainfall', 'forecast_temperature',
+        'demand_lag_1m', 'demand_lag_3m', 'demand_lag_6m'
+    ]
+    categorical_features = ['district', 'month', 'season']
 
     X = df[numerical_features + categorical_features]
     y = df['demand_per_capita']
