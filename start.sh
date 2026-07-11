@@ -2,10 +2,10 @@
 set -e
 
 echo "Running migrations..."
-cd backend && python manage.py migrate --noinput && cd ..
+cd backend && python3 manage.py migrate --noinput && cd ..
 
 echo "Collecting static files..."
-cd backend && python manage.py collectstatic --noinput && cd ..
+cd backend && python3 manage.py collectstatic --noinput && cd ..
 
 echo "Building frontend..."
 cd frontend && npm install && npm run build && cd ..
