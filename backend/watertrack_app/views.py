@@ -541,8 +541,47 @@ def predict_water_demand(request):
         flow_rate = float(data.get('flow_rate', 55.0))
         district = data.get('district', 'Ilala')
         
-        current_month = datetime.now().strftime('%b')
-        month = data.get('month', current_month)
+        current_month_name = datetime.now().strftime('%b')
+        month_name = data.get('month', current_month_name)
+        
+        month_map = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+                     "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12,
+                     "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6,
+                     "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12}
+        month = month_map.get(month_name, datetime.now().month)
+        
+        now = datetime.now()
+        year = int(data.get('year', now.year))
+        
+        date = datetime(year, month, 1)
+        day_of_week = date.weekday()
+        season = "Rainy" if month in [3, 4, 5, 11] else "Dry" if month in [6, 7, 8, 9, 10] else "Short Rains" if month == 12 else "Hot"
+        is_weekend = 1 if day_of_week >= 5 else 0
+        is_holiday = int(data.get('is_holiday', 0))
+        
+        district_profiles = {
+            'Ilala': {'income_level': 3, 'industrial_activity': 60, 'tourism': 70, 'pipe_age': 25, 'leakage_rate': 22.5, 'storage_capacity': 250000},
+            'Kinondoni': {'income_level': 4, 'industrial_activity': 40, 'tourism': 50, 'pipe_age': 20, 'leakage_rate': 18.0, 'storage_capacity': 300000},
+            'Temeke': {'income_level': 2, 'industrial_activity': 70, 'tourism': 30, 'pipe_age': 30, 'leakage_rate': 28.0, 'storage_capacity': 200000},
+            'Kigamboni': {'income_level': 3, 'industrial_activity': 20, 'tourism': 40, 'pipe_age': 15, 'leakage_rate': 15.0, 'storage_capacity': 150000},
+            'Ubungo': {'income_level': 3, 'industrial_activity': 50, 'tourism': 45, 'pipe_age': 22, 'leakage_rate': 20.0, 'storage_capacity': 220000},
+            'Arusha': {'income_level': 3, 'industrial_activity': 45, 'tourism': 80, 'pipe_age': 18, 'leakage_rate': 17.0, 'storage_capacity': 180000},
+            'Mwanza': {'income_level': 2, 'industrial_activity': 35, 'tourism': 60, 'pipe_age': 28, 'leakage_rate': 25.0, 'storage_capacity': 170000},
+            'Dodoma': {'income_level': 2, 'industrial_activity': 30, 'tourism': 40, 'pipe_age': 32, 'leakage_rate': 30.0, 'storage_capacity': 140000},
+            'Mbeya': {'income_level': 2, 'industrial_activity': 40, 'tourism': 55, 'pipe_age': 24, 'leakage_rate': 23.0, 'storage_capacity': 190000},
+            'Morogoro': {'income_level': 2, 'industrial_activity': 25, 'tourism': 50, 'pipe_age': 26, 'leakage_rate': 24.0, 'storage_capacity': 160000},
+        }
+        
+        profile = district_profiles.get(district, {
+            'income_level': 3, 'industrial_activity': 50, 'tourism': 50,
+            'pipe_age': 25, 'leakage_rate': 25.0, 'storage_capacity': 200000
+        })
+        
+        forecast_rainfall = float(data.get('forecast_rainfall', rainfall))
+        forecast_temperature = float(data.get('forecast_temperature', temperature))
+        demand_lag_1m = float(data.get('demand_lag_1m', 0))
+        demand_lag_3m = float(data.get('demand_lag_3m', 0))
+        demand_lag_6m = float(data.get('demand_lag_6m', 0))
         
         model_path = os.path.join(settings.BASE_DIR, 'water_model.pkl')
         if not os.path.exists(model_path):
@@ -550,7 +589,6 @@ def predict_water_demand(request):
             
         model = joblib.load(model_path)
         
-        # Predict expects a DataFrame for the ColumnTransformer
         import pandas as pd
         input_data = pd.DataFrame([{
             'temperature': temperature,
@@ -562,7 +600,23 @@ def predict_water_demand(request):
             'turbidity': turbidity,
             'flow_rate': flow_rate,
             'district': district,
-            'month': month
+            'month': month,
+            'year': year,
+            'day_of_week': day_of_week,
+            'season': season,
+            'is_weekend': is_weekend,
+            'is_holiday': is_holiday,
+            'income_level': profile['income_level'],
+            'industrial_activity': profile['industrial_activity'],
+            'tourism': profile['tourism'],
+            'pipe_age': profile['pipe_age'],
+            'leakage_rate': profile['leakage_rate'],
+            'storage_capacity': profile['storage_capacity'],
+            'forecast_rainfall': forecast_rainfall,
+            'forecast_temperature': forecast_temperature,
+            'demand_lag_1m': demand_lag_1m,
+            'demand_lag_3m': demand_lag_3m,
+            'demand_lag_6m': demand_lag_6m
         }])
         
         predicted_per_capita = model.predict(input_data)[0]
@@ -581,7 +635,23 @@ def predict_water_demand(request):
                 'turbidity': turbidity,
                 'flow_rate': flow_rate,
                 'district': district,
-                'month': month
+                'month': month_name,
+                'year': year,
+                'day_of_week': day_of_week,
+                'season': season,
+                'is_weekend': bool(is_weekend),
+                'is_holiday': bool(is_holiday),
+                'income_level': profile['income_level'],
+                'industrial_activity': profile['industrial_activity'],
+                'tourism': profile['tourism'],
+                'pipe_age': profile['pipe_age'],
+                'leakage_rate': profile['leakage_rate'],
+                'storage_capacity': profile['storage_capacity'],
+                'forecast_rainfall': forecast_rainfall,
+                'forecast_temperature': forecast_temperature,
+                'demand_lag_1m': demand_lag_1m,
+                'demand_lag_3m': demand_lag_3m,
+                'demand_lag_6m': demand_lag_6m
             }
         })
     except Exception as e:
