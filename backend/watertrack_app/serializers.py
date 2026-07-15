@@ -1,9 +1,7 @@
 # backend/watertrack_app/serializers.py
-
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from .models import *
-
 class VillageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Village
@@ -26,7 +24,6 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.save()
         return user
 
-
 class UserSerializer(serializers.ModelSerializer):
     village = VillageSerializer(read_only=True)
     village_id = serializers.PrimaryKeyRelatedField(
@@ -41,7 +38,6 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'role', 'phone', 'village', 'village_id', 'password', 'is_superuser'
         ]
-
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         user = super().create(validated_data)
@@ -71,7 +67,6 @@ class LoginSerializer(serializers.ModelSerializer):
     is_superuser = serializers.BooleanField(read_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
-    
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'role', 'phone', 'village', 'is_superuser', 'access', 'refresh']
@@ -104,7 +99,6 @@ class WaterSourceSerializer(serializers.ModelSerializer):
                 'is_safe': latest.is_safe
             }
         return None
-
 class QualityReportSerializer(serializers.ModelSerializer):
     water_source = WaterSourceSerializer(read_only=True)
     tested_by = UserSerializer(read_only=True)
@@ -162,7 +156,6 @@ class MessageSerializer(serializers.ModelSerializer):
     related_report_id = serializers.PrimaryKeyRelatedField(
         queryset=DamageReport.objects.all(), source='related_report', write_only=True, required=False, allow_null=True
     )
-
     class Meta:
         model = Message
         fields = [
